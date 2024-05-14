@@ -53,13 +53,6 @@ else
 	mkdir -p $(GOBIN)/linux_amd64
 	env GOOS=linux GOARCH=amd64 $(GO) build -o $(GOBIN)/linux_amd64 $(GOFLAGS) -trimpath -tags '$(BUILD_TAGS) production' -ldflags '$(LDFLAGS)' ./cmd/...
 endif
-	@echo Build CMD Linux arm64
-ifeq ($(BUILDER_GOOS_GOARCH),"linux_arm64")
-	env GOOS=linux GOARCH=arm64 $(GO) build -o $(GOBIN) $(GOFLAGS) -trimpath -tags '$(BUILD_TAGS) production' -ldflags '$(LDFLAGS)' ./cmd/...
-else
-	mkdir -p $(GOBIN)/linux_arm64
-	env GOOS=linux GOARCH=arm64 $(GO) build -o $(GOBIN)/linux_arm64 $(GOFLAGS) -trimpath -tags '$(BUILD_TAGS) production' -ldflags '$(LDFLAGS)' ./cmd/...
-endif
 
 build-cmd-osx:
 	@echo Build CMD OSX amd64

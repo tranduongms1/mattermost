@@ -497,6 +497,8 @@ func (a *App) CreateGroupChannel(c request.CTX, userIDs []string, creatorId stri
 		return nil, err
 	}
 
+	a.UpdateChannelMemberSchemeRoles(c, channel.Id, creatorId, false, true, true)
+
 	for _, userID := range userIDs {
 		a.InvalidateCacheForUser(userID)
 	}
@@ -837,6 +839,10 @@ func (a *App) PatchChannel(c request.CTX, channel *model.Channel, patch *model.C
 	oldChannelPurpose := channel.Purpose
 
 	channel.Patch(patch)
+	if channel.Type == model.ChannelTypeGroup && oldChannelDisplayName != channel.DisplayName {
+		channel.Purpose = channel.DisplayName
+		channel.DisplayName = oldChannelDisplayName
+	}
 	channel, err := a.UpdateChannel(c, channel)
 	if err != nil {
 		return nil, err
@@ -854,7 +860,7 @@ func (a *App) PatchChannel(c request.CTX, channel *model.Channel, patch *model.C
 		}
 	}
 
-	if channel.Purpose != oldChannelPurpose {
+	if channel.Purpose != oldChannelPurpose && channel.Type != model.ChannelTypeGroup {
 		if err = a.PostUpdateChannelPurposeMessage(c, userID, channel, oldChannelPurpose, channel.Purpose); err != nil {
 			c.Logger().Warn(err.Error())
 		}
@@ -1516,7 +1522,7 @@ func (a *App) DeleteChannel(c request.CTX, channel *model.Channel, userID string
 }
 
 func (a *App) addUserToChannel(c request.CTX, user *model.User, channel *model.Channel) (*model.ChannelMember, *model.AppError) {
-	if channel.Type != model.ChannelTypeOpen && channel.Type != model.ChannelTypePrivate {
+	if channel.Type == model.ChannelTypeDirect {
 		return nil, model.NewAppError("AddUserToChannel", "api.channel.add_user_to_channel.type.app_error", nil, "", http.StatusBadRequest)
 	}
 

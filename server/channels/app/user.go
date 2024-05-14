@@ -43,6 +43,8 @@ const (
 	ImageProfilePixelDimension = 128
 )
 
+const DefaultChannelId = "eeknjapc4tgpdbue1bb64iogxc"
+
 func (a *App) CreateUserWithToken(c request.CTX, user *model.User, token *model.Token) (*model.User, *model.AppError) {
 	if err := a.IsUserSignUpAllowed(); err != nil {
 		return nil, err
@@ -566,6 +568,9 @@ func (a *App) GetUsersNotInTeamEtag(teamID string, restrictionsHash string) stri
 }
 
 func (a *App) GetUsersInChannel(options *model.UserGetOptions) ([]*model.User, *model.AppError) {
+	if options.InChannelId == DefaultChannelId {
+		return []*model.User{}, nil
+	}
 	users, err := a.Srv().Store().User().GetProfilesInChannel(options)
 	if err != nil {
 		return nil, model.NewAppError("GetUsersInChannel", "app.user.get_profiles.app_error", nil, "", http.StatusInternalServerError).Wrap(err)
@@ -575,6 +580,9 @@ func (a *App) GetUsersInChannel(options *model.UserGetOptions) ([]*model.User, *
 }
 
 func (a *App) GetUsersInChannelByStatus(options *model.UserGetOptions) ([]*model.User, *model.AppError) {
+	if options.InChannelId == DefaultChannelId {
+		return []*model.User{}, nil
+	}
 	users, err := a.Srv().Store().User().GetProfilesInChannelByStatus(options)
 	if err != nil {
 		return nil, model.NewAppError("GetUsersInChannelByStatus", "app.user.get_profiles.app_error", nil, "", http.StatusInternalServerError).Wrap(err)
@@ -584,6 +592,9 @@ func (a *App) GetUsersInChannelByStatus(options *model.UserGetOptions) ([]*model
 }
 
 func (a *App) GetUsersInChannelByAdmin(options *model.UserGetOptions) ([]*model.User, *model.AppError) {
+	if options.InChannelId == DefaultChannelId {
+		return []*model.User{}, nil
+	}
 	users, err := a.Srv().Store().User().GetProfilesInChannelByAdmin(options)
 	if err != nil {
 		return nil, model.NewAppError("GetUsersInChannelByAdmin", "app.user.get_profiles.app_error", nil, "", http.StatusInternalServerError).Wrap(err)
@@ -2372,7 +2383,7 @@ func (a *App) userBelongsToChannels(userID string, channelIDs []string) (bool, *
 }
 
 func (a *App) GetViewUsersRestrictions(c request.CTX, userID string) (*model.ViewUsersRestrictions, *model.AppError) {
-	if a.HasPermissionTo(userID, model.PermissionViewMembers) {
+	if a.HasPermissionTo(userID, model.PermissionManageSystem) {
 		return nil, nil
 	}
 
@@ -2395,7 +2406,9 @@ func (a *App) GetViewUsersRestrictions(c request.CTX, userID string) (*model.Vie
 
 	channelIDs := []string{}
 	for channelID := range userChannelMembers {
-		channelIDs = append(channelIDs, channelID)
+		if channelID != DefaultChannelId {
+			channelIDs = append(channelIDs, channelID)
+		}
 	}
 
 	return &model.ViewUsersRestrictions{Teams: teamIDsWithPermission, Channels: channelIDs}, nil
