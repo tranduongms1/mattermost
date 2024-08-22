@@ -23,7 +23,7 @@ const (
 	ChannelTypeDirect  ChannelType = "D"
 	ChannelTypeGroup   ChannelType = "G"
 
-	ChannelGroupMaxUsers       = 8
+	ChannelGroupMaxUsers       = 80
 	ChannelGroupMinUsers       = 3
 	DefaultChannelName         = "town-square"
 	ChannelDisplayNameMaxRunes = 64
@@ -391,6 +391,7 @@ func GetGroupNameFromUserIds(userIds []string) string {
 	for _, id := range userIds {
 		io.WriteString(h, id)
 	}
+	io.WriteString(h, NewId())
 
 	return hex.EncodeToString(h.Sum(nil))
 }
