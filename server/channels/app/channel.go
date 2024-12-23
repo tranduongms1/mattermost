@@ -502,6 +502,8 @@ func (a *App) CreateGroupChannel(c request.CTX, userIDs []string, creatorId stri
 		return nil, err
 	}
 
+	a.UpdateChannelMemberSchemeRoles(c, channel.Id, creatorId, false, true, true)
+
 	jsonIDs := model.ArrayToJSON(userIDs)
 	for _, userID := range userIDs {
 		a.Srv().Platform().InvalidateChannelCacheForUser(userID)
@@ -851,6 +853,12 @@ func (a *App) PatchChannel(c request.CTX, channel *model.Channel, patch *model.C
 	oldChannelPurpose := channel.Purpose
 
 	channel.Patch(patch)
+	if channel.Type == model.ChannelTypeGroup {
+		if channel.DisplayName != oldChannelDisplayName {
+			channel.Purpose = channel.DisplayName
+			channel.DisplayName = oldChannelDisplayName
+		}
+	}
 	channel, err := a.UpdateChannel(c, channel)
 	if err != nil {
 		return nil, err
@@ -868,7 +876,7 @@ func (a *App) PatchChannel(c request.CTX, channel *model.Channel, patch *model.C
 		}
 	}
 
-	if channel.Purpose != oldChannelPurpose {
+	if channel.Purpose != oldChannelPurpose && channel.Type != model.ChannelTypeGroup {
 		if err = a.PostUpdateChannelPurposeMessage(c, userID, channel, oldChannelPurpose, channel.Purpose); err != nil {
 			c.Logger().Warn(err.Error())
 		}
@@ -1596,7 +1604,7 @@ func (a *App) addUserToChannel(c request.CTX, user *model.User, channel *model.C
 
 // AddUserToChannel adds a user to a given channel.
 func (a *App) AddUserToChannel(c request.CTX, user *model.User, channel *model.Channel, skipTeamMemberIntegrityCheck bool) (*model.ChannelMember, *model.AppError) {
-	if !skipTeamMemberIntegrityCheck {
+	if !channel.IsGroupOrDirect() && !skipTeamMemberIntegrityCheck {
 		teamMember, nErr := a.Srv().Store().Team().GetMember(c, channel.TeamId, user.Id)
 		if nErr != nil {
 			var nfErr *store.ErrNotFound

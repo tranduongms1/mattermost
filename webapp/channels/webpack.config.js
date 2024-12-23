@@ -399,6 +399,7 @@ if (targetIsDevServer) {
         logLevel: 'silent',
         target: process.env.MM_SERVICESETTINGS_SITEURL ?? 'http://localhost:8065',
         xfwd: true,
+        changeOrigin: true
     };
 
     config = {

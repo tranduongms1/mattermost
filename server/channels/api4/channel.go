@@ -354,7 +354,17 @@ func patchChannel(c *Context, w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-	case model.ChannelTypeGroup, model.ChannelTypeDirect:
+	case model.ChannelTypeGroup:
+		if !c.App.SessionHasPermissionToChannel(c.AppContext, *c.AppContext.Session(), c.Params.ChannelId, model.PermissionManagePrivateChannelProperties) {
+			c.SetPermissionError(model.PermissionManagePrivateChannelProperties)
+			return
+		}
+		if patch.Name != nil && *patch.Name != oldChannel.Name {
+			c.Err = model.NewAppError("patchChannel", "api.channel.patch_update_channel.update_direct_or_group_messages_not_allowed.app_error", nil, "", http.StatusBadRequest)
+			return
+		}
+
+	case model.ChannelTypeDirect:
 		// Modifying the header is not linked to any specific permission for group/dm channels, so just check for membership.
 		if _, appErr = c.App.GetChannelMember(c.AppContext, c.Params.ChannelId, c.AppContext.Session().UserId); appErr != nil {
 			c.Err = model.NewAppError("patchChannel", "api.channel.patch_update_channel.forbidden.app_error", nil, "", http.StatusForbidden)
@@ -1807,7 +1817,7 @@ func addChannelMember(c *Context, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if channel.Type == model.ChannelTypeDirect || channel.Type == model.ChannelTypeGroup {
+	if channel.Type == model.ChannelTypeDirect {
 		c.Err = model.NewAppError("addUserToChannel", "api.channel.add_user_to_channel.type.app_error", nil, "", http.StatusBadRequest)
 		return
 	}
@@ -1964,7 +1974,7 @@ func removeChannelMember(c *Context, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !(channel.Type == model.ChannelTypeOpen || channel.Type == model.ChannelTypePrivate) {
+	if channel.Type == model.ChannelTypeDirect {
 		c.Err = model.NewAppError("removeChannelMember", "api.channel.remove_channel_member.type.app_error", nil, "", http.StatusBadRequest)
 		return
 	}
