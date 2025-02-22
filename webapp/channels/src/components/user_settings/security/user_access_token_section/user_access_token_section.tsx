@@ -12,7 +12,6 @@ import * as UserUtils from 'mattermost-redux/utils/user_utils';
 import {trackEvent} from 'actions/telemetry_actions.jsx';
 
 import ConfirmModal from 'components/confirm_modal';
-import ExternalLink from 'components/external_link';
 import FormattedMarkdownMessage from 'components/formatted_markdown_message';
 import SaveButton from 'components/save_button';
 import SettingItemMax from 'components/setting_item_max';
@@ -20,9 +19,8 @@ import SettingItemMin from 'components/setting_item_min';
 import type SettingItemMinComponent from 'components/setting_item_min';
 import WarningIcon from 'components/widgets/icons/fa_warning_icon';
 
-import {Constants, DeveloperLinks} from 'utils/constants';
+import {Constants} from 'utils/constants';
 import * as Keyboard from 'utils/keyboard';
-import {isMobile} from 'utils/user_agent';
 import * as Utils from 'utils/utils';
 
 const SECTION_TOKENS = 'tokens';
@@ -266,7 +264,7 @@ export default class UserAccessTokenSection extends React.PureComponent<Props, S
                 <div className='alert alert-danger'>
                     <FormattedMarkdownMessage
                         id='user.settings.tokens.confirmDeleteMessage'
-                        defaultMessage='Any integrations using this token will no longer be able to access the Mattermost API. You cannot undo this action. \n \nAre you sure want to delete the **{description}** token?'
+                        defaultMessage='Any integrations using this token will no longer be able to access the API. You cannot undo this action. \n \nAre you sure want to delete the **{description}** token?'
                         values={{
                             description: token.description,
                         }}
@@ -432,63 +430,6 @@ export default class UserAccessTokenSection extends React.PureComponent<Props, S
             );
         }
 
-        let extraInfo;
-        if (isMobile()) {
-            extraInfo = (
-                <span>
-                    <FormattedMessage
-                        id='user.settings.tokens.description_mobile'
-                        defaultMessage='<linkTokens>Personal access tokens</linkTokens> function similarly to session tokens and can be used by integrations to <linkAPI>authenticate against the REST API</linkAPI>. Create new tokens on your desktop.'
-                        values={{
-                            linkTokens: (msg: React.ReactNode) => (
-                                <ExternalLink
-                                    href={DeveloperLinks.PERSONAL_ACCESS_TOKENS}
-                                    location='user_access_token_section'
-                                >
-                                    {msg}
-                                </ExternalLink>
-                            ),
-                            linkAPI: (msg: React.ReactNode) => (
-                                <ExternalLink
-                                    href='https://api.mattermost.com/#tag/authentication'
-                                    location='user_access_token_section'
-                                >
-                                    {msg}
-                                </ExternalLink>
-                            ),
-                        }}
-                    />
-                </span>
-            );
-        } else {
-            extraInfo = (
-                <span>
-                    <FormattedMessage
-                        id='user.settings.tokens.description'
-                        defaultMessage='<linkTokens>Personal access tokens</linkTokens> function similarly to session tokens and can be used by integrations to <linkAPI>authenticate against the REST API</linkAPI>.'
-                        values={{
-                            linkTokens: (msg: React.ReactNode) => (
-                                <ExternalLink
-                                    href={DeveloperLinks.PERSONAL_ACCESS_TOKENS}
-                                    location='user_access_token_section'
-                                >
-                                    {msg}
-                                </ExternalLink>
-                            ),
-                            linkAPI: (msg: React.ReactNode) => (
-                                <ExternalLink
-                                    href='https://api.mattermost.com/#tag/authentication'
-                                    location='user_access_token_section'
-                                >
-                                    {msg}
-                                </ExternalLink>
-                            ),
-                        }}
-                    />
-                </span>
-            );
-        }
-
         let newTokenSection;
         if (this.state.tokenCreationState === TOKEN_CREATING) {
             newTokenSection = (
@@ -623,7 +564,6 @@ export default class UserAccessTokenSection extends React.PureComponent<Props, S
                 <SettingItemMax
                     title={Utils.localizeMessage({id: 'user.settings.tokens.title', defaultMessage: 'Personal Access Tokens'})}
                     inputs={inputs}
-                    extraInfo={extraInfo}
                     infoPosition='top'
                     serverError={this.state.serverError}
                     updateSection={this.props.updateSection}

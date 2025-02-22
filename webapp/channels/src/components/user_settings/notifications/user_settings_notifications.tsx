@@ -7,19 +7,14 @@ import React from 'react';
 import type {ChangeEvent} from 'react';
 import type {WrappedComponentProps} from 'react-intl';
 import {FormattedMessage, injectIntl} from 'react-intl';
-import type {Styles as ReactSelectStyles, ValueType} from 'react-select';
-import CreatableReactSelect from 'react-select/creatable';
-
-import {LightbulbOutlineIcon} from '@mattermost/compass-icons/components';
+import type {ValueType} from 'react-select';
 import type {PreferencesType} from '@mattermost/types/preferences';
 import type {UserNotifyProps, UserProfile} from '@mattermost/types/users';
 
-import ExternalLink from 'components/external_link';
 import SettingItem from 'components/setting_item';
 import SettingItemMax from 'components/setting_item_max';
-import RestrictedIndicator from 'components/widgets/menu/menu_items/restricted_indicator';
 
-import Constants, {NotificationLevels, MattermostFeatures, LicenseSkus, UserSettingsNotificationSections} from 'utils/constants';
+import Constants, {NotificationLevels, UserSettingsNotificationSections} from 'utils/constants';
 import {notificationSoundKeys, stopTryNotificationRing} from 'utils/notification_sounds';
 import {a11yFocus} from 'utils/utils';
 
@@ -484,308 +479,6 @@ class NotificationsTab extends React.PureComponent<Props, State> {
         this.props.closeModal();
     };
 
-    createKeywordsWithNotificationSection = () => {
-        const serverError = this.state.serverError;
-        const user = this.props.user;
-        const isSectionExpanded = this.props.activeSection === UserSettingsNotificationSections.KEYWORDS_MENTIONS;
-
-        let expandedSection = null;
-        if (isSectionExpanded) {
-            const inputs = [];
-
-            if (user.first_name) {
-                inputs.push(
-                    <div key='userNotificationFirstNameOption'>
-                        <div className='checkbox'>
-                            <label>
-                                <input
-                                    id='notificationTriggerFirst'
-                                    type='checkbox'
-                                    checked={this.state.firstNameKey}
-                                    onChange={this.handleChangeForFirstNameKeyCheckbox}
-                                />
-                                <FormattedMessage
-                                    id='user.settings.notifications.sensitiveName'
-                                    defaultMessage='Your case-sensitive first name "{first_name}"'
-                                    values={{
-                                        first_name: user.first_name,
-                                    }}
-                                />
-                            </label>
-                        </div>
-                    </div>,
-                );
-            }
-
-            inputs.push(
-                <div key='userNotificationUsernameOption'>
-                    <div className='checkbox'>
-                        <label>
-                            <input
-                                id='notificationTriggerUsername'
-                                type='checkbox'
-                                checked={this.state.usernameKey}
-                                onChange={this.handleChangeForUsernameKeyCheckbox}
-                            />
-                            <FormattedMessage
-                                id='user.settings.notifications.sensitiveUsername'
-                                defaultMessage='Your non case-sensitive username "{username}"'
-                                values={{
-                                    username: user.username,
-                                }}
-                            />
-                        </label>
-                    </div>
-                </div>,
-            );
-
-            inputs.push(
-                <div key='userNotificationChannelOption'>
-                    <div className='checkbox'>
-                        <label>
-                            <input
-                                id='notificationTriggerShouts'
-                                type='checkbox'
-                                checked={this.state.channelKey}
-                                onChange={this.handleChangeForChannelKeyCheckbox}
-                            />
-                            <FormattedMessage
-                                id='user.settings.notifications.channelWide'
-                                defaultMessage='Channel-wide mentions "@channel", "@all", "@here"'
-                            />
-                        </label>
-                    </div>
-                </div>,
-            );
-
-            inputs.push(
-                <div
-                    key='userNotificationCustomOption'
-                    className='customKeywordsWithNotificationSubsection'
-                >
-                    <div className='checkbox'>
-                        <label>
-                            <input
-                                id='notificationTriggerCustom'
-                                type='checkbox'
-                                checked={this.state.isCustomKeysWithNotificationInputChecked}
-                                onChange={this.handleChangeForCustomKeysWithNotificationCheckbox}
-                            />
-                            <FormattedMessage
-                                id='user.settings.notifications.sensitiveCustomWords'
-                                defaultMessage='Other non case-sensitive words, press Tab or use commas to separate keywords:'
-                            />
-                        </label>
-                    </div>
-                    <CreatableReactSelect
-                        inputId='notificationTriggerCustomText'
-                        autoFocus={true}
-                        isClearable={false}
-                        isMulti={true}
-                        styles={customKeywordsSelectorStyles}
-                        placeholder=''
-                        components={{
-                            DropdownIndicator: () => null,
-                            Menu: () => null,
-                            MenuList: () => null,
-                        }}
-                        aria-labelledby='notificationTriggerCustom'
-                        onChange={this.handleChangeForCustomKeysWithNotificationInput}
-                        value={this.state.customKeysWithNotification}
-                        inputValue={this.state.customKeysWithNotificationInputValue}
-                        onInputChange={this.handleChangeForCustomKeysWithNotificationInputValue}
-                        onBlur={this.handleBlurForCustomKeysWithNotificationInput}
-                        onKeyDown={this.handleOnKeydownForCustomKeysWithNotificationInput}
-                    />
-                </div>,
-            );
-
-            const extraInfo = (
-                <FormattedMessage
-                    id='user.settings.notifications.keywordsWithNotification.extraInfo'
-                    defaultMessage='Notifications are triggered when someone sends a message that includes your username ("@{username}") or any of the options selected above.'
-                    values={{
-                        username: user.username,
-                    }}
-                />
-            );
-
-            expandedSection = (
-                <SettingItemMax
-                    title={this.props.intl.formatMessage({id: 'user.settings.notifications.keywordsWithNotification.title', defaultMessage: 'Keywords that trigger notifications'})}
-                    inputs={inputs}
-                    submit={this.handleSubmit}
-                    saving={this.state.isSaving}
-                    serverError={serverError}
-                    extraInfo={extraInfo}
-                    updateSection={this.handleUpdateSection}
-                />
-            );
-        }
-
-        const selectedMentionKeys = ['@' + user.username];
-        if (this.state.firstNameKey) {
-            selectedMentionKeys.push(user.first_name);
-        }
-        if (this.state.usernameKey) {
-            selectedMentionKeys.push(user.username);
-        }
-        if (this.state.channelKey) {
-            selectedMentionKeys.push('@channel');
-            selectedMentionKeys.push('@all');
-            selectedMentionKeys.push('@here');
-        }
-        if (this.state.customKeysWithNotification.length > 0) {
-            const customKeysWithNotificationStringArray = this.state.customKeysWithNotification.map((key) => key.value);
-            selectedMentionKeys.push(...customKeysWithNotificationStringArray);
-        }
-        const collapsedDescription = selectedMentionKeys.filter((key) => key.trim().length !== 0).map((key) => `"${key}"`).join(', ');
-
-        return (
-            <SettingItem
-                title={this.props.intl.formatMessage({id: 'user.settings.notifications.keywordsWithNotification.title', defaultMessage: 'Keywords that trigger notifications'})}
-                section={UserSettingsNotificationSections.KEYWORDS_MENTIONS}
-                active={isSectionExpanded}
-                areAllSectionsInactive={this.props.activeSection === ''}
-                describe={collapsedDescription}
-                updateSection={this.handleUpdateSection}
-                max={expandedSection}
-            />);
-    };
-
-    createKeywordsWithHighlightSection = () => {
-        const isSectionExpanded = this.props.activeSection === UserSettingsNotificationSections.KEYWORDS_HIGHLIGHT;
-
-        let expandedSection = null;
-        if (isSectionExpanded) {
-            const inputs = [(
-                <div
-                    key='userNotificationHighlightOption'
-                    className='customKeywordsWithNotificationSubsection'
-                >
-                    <label htmlFor='mentionKeysWithHighlightInput'>
-                        <FormattedMessage
-                            id='user.settings.notifications.keywordsWithHighlight.inputTitle'
-                            defaultMessage='Enter non case-sensitive keywords, press Tab or use commas to separate them:'
-                        />
-                    </label>
-                    <CreatableReactSelect
-                        inputId='mentionKeysWithHighlightInput'
-                        autoFocus={true}
-                        isClearable={false}
-                        isMulti={true}
-                        styles={customKeywordsSelectorStyles}
-                        placeholder=''
-                        components={{
-                            DropdownIndicator: () => null,
-                            Menu: () => null,
-                            MenuList: () => null,
-                        }}
-                        aria-labelledby='mentionKeysWithHighlightInput'
-                        onChange={this.handleChangeForCustomKeysWithHighlightInput}
-                        value={this.state.customKeysWithHighlight}
-                        inputValue={this.state.customKeysWithHighlightInputValue}
-                        onInputChange={this.handleChangeForCustomKeysWithHighlightInputValue}
-                        onBlur={this.handleBlurForCustomKeysWithHighlightInput}
-                        onKeyDown={this.handleOnKeydownForCustomKeysWithHighlightInput}
-                    />
-                </div>
-            )];
-
-            const extraInfo = (
-                <FormattedMessage
-                    id='user.settings.notifications.keywordsWithHighlight.extraInfo'
-                    defaultMessage='These keywords will be shown to you with a highlight when anyone sends a message that includes them.'
-                />
-            );
-
-            expandedSection = (
-                <SettingItemMax
-                    title={this.props.intl.formatMessage({id: 'user.settings.notifications.keywordsWithHighlight.title', defaultMessage: 'Keywords that get highlighted (without notifications)'})}
-                    inputs={inputs}
-                    submit={this.handleSubmit}
-                    saving={this.state.isSaving}
-                    serverError={this.state.serverError}
-                    extraInfo={extraInfo}
-                    updateSection={this.handleUpdateSection}
-                />
-            );
-        }
-
-        let collapsedDescription = this.props.intl.formatMessage({id: 'user.settings.notifications.keywordsWithHighlight.none', defaultMessage: 'None'});
-        if (!this.props.isEnterpriseOrCloudOrSKUStarterFree && this.props.isEnterpriseReady && this.state.customKeysWithHighlight.length > 0) {
-            const customKeysWithHighlightStringArray = this.state.customKeysWithHighlight.map((key) => key.value);
-            collapsedDescription = customKeysWithHighlightStringArray.map((key) => `"${key}"`).join(', ');
-        }
-
-        const collapsedEditButtonWhenDisabled = (
-            <RestrictedIndicator
-                blocked={this.props.isEnterpriseOrCloudOrSKUStarterFree && this.props.isEnterpriseReady}
-                feature={MattermostFeatures.HIGHLIGHT_WITHOUT_NOTIFICATION}
-                minimumPlanRequiredForFeature={LicenseSkus.Professional}
-                tooltipTitle={this.props.intl.formatMessage({
-                    id: 'user.settings.notifications.keywordsWithHighlight.disabledTooltipTitle',
-                    defaultMessage: 'Professional feature',
-                })}
-                tooltipMessageBlocked={this.props.intl.formatMessage({
-                    id: 'user.settings.notifications.keywordsWithHighlight.disabledTooltipMessage',
-                    defaultMessage:
-                    'This feature is available on the Professional plan',
-                })}
-                titleAdminPreTrial={this.props.intl.formatMessage({
-                    id: 'user.settings.notifications.keywordsWithHighlight.userModal.titleAdminPreTrial',
-                    defaultMessage: 'Highlight keywords without notifications with Mattermost Professional',
-                })}
-                messageAdminPreTrial={this.props.intl.formatMessage({
-                    id: 'user.settings.notifications.keywordsWithHighlight.userModal.messageAdminPreTrial',
-                    defaultMessage: 'Get the ability to passively highlight keywords that you care about. Upgrade to Professional plan to unlock this feature.',
-                })}
-                titleAdminPostTrial={this.props.intl.formatMessage({
-                    id: 'user.settings.notifications.keywordsWithHighlight.userModal.titleAdminPostTrial',
-                    defaultMessage: 'Highlight keywords without notifications with Mattermost Professional',
-                })}
-                messageAdminPostTrial={this.props.intl.formatMessage({
-                    id: 'user.settings.notifications.keywordsWithHighlight.userModal.messageAdminPostTrial',
-                    defaultMessage: 'Get the ability to passively highlight keywords that you care about. Upgrade to Professional plan to unlock this feature.',
-                },
-                )}
-                titleEndUser={this.props.intl.formatMessage({
-                    id: 'user.settings.notifications.keywordsWithHighlight.userModal.titleEndUser',
-                    defaultMessage: 'Highlight keywords without notifications with Mattermost Professional',
-                })}
-                messageEndUser={this.props.intl.formatMessage(
-                    {
-                        id: 'user.settings.notifications.keywordsWithHighlight.userModal.messageEndUser',
-                        defaultMessage: 'Get the ability to passively highlight keywords that you care about.{br}{br}Request your admin to upgrade to Mattermost Professional to access this feature.',
-                    },
-                    {
-                        br: <br/>,
-                    },
-                )}
-                ctaExtraContent={
-                    <FormattedMessage
-                        id='user.settings.notifications.keywordsWithHighlight.professional'
-                        defaultMessage='Professional'
-                    />
-                }
-                clickCallback={this.handleCloseSettingsModal}
-            />
-        );
-
-        return (
-            <SettingItem
-                title={this.props.intl.formatMessage({id: 'user.settings.notifications.keywordsWithHighlight.title', defaultMessage: 'Keywords that get highlighted (without notifications)'})}
-                section={UserSettingsNotificationSections.KEYWORDS_HIGHLIGHT}
-                active={isSectionExpanded}
-                areAllSectionsInactive={this.props.activeSection === ''}
-                describe={collapsedDescription}
-                updateSection={this.handleUpdateSection}
-                max={expandedSection}
-                isDisabled={this.props.isEnterpriseOrCloudOrSKUStarterFree && this.props.isEnterpriseReady}
-                collapsedEditButtonWhenDisabled={collapsedEditButtonWhenDisabled}
-            />);
-    };
-
     createCommentsSection = () => {
         const serverError = this.state.serverError;
 
@@ -964,8 +657,6 @@ class NotificationsTab extends React.PureComponent<Props, State> {
     };
 
     render() {
-        const keywordsWithNotificationSection = this.createKeywordsWithNotificationSection();
-        const keywordsWithHighlightSection = this.createKeywordsWithHighlightSection();
         const commentsSection = this.createCommentsSection();
         const autoResponderSection = this.createAutoResponderSection();
 
@@ -992,24 +683,6 @@ class NotificationsTab extends React.PureComponent<Props, State> {
                             <FormattedMessage
                                 id='user.settings.notifications.header'
                                 defaultMessage='Notifications'
-                            />
-                        }
-                        info={
-                            <FormattedMessage
-                                id='user.settings.notifications.learnMore'
-                                defaultMessage='<a>Learn more about notifications</a>'
-                                values={{
-                                    a: (chunks: string) => ((
-                                        <ExternalLink
-                                            location='user_settings_notifications'
-                                            href='https://mattermost.com/pl/about-notifications'
-                                            className='btn btn-link'
-                                        >
-                                            <LightbulbOutlineIcon className='circular-border'/>
-                                            <span>{chunks}</span>
-                                        </ExternalLink>
-                                    )),
-                                }}
                             />
                         }
                     />
@@ -1064,14 +737,6 @@ class NotificationsTab extends React.PureComponent<Props, State> {
                         threads={this.state.emailThreads || ''}
                     />
                     <div className='divider-light'/>
-                    {keywordsWithNotificationSection}
-                    {(!this.props.isEnterpriseOrCloudOrSKUStarterFree && this.props.isEnterpriseReady) && (
-                        <>
-                            <div className='divider-light'/>
-                            {keywordsWithHighlightSection}
-                        </>
-                    )}
-                    <div className='divider-light'/>
                     {!this.props.isCollapsedThreadsEnabled && (
                         <>
                             <div className='divider-light'/>
@@ -1084,61 +749,12 @@ class NotificationsTab extends React.PureComponent<Props, State> {
                             {autoResponderSection}
                         </>
                     )}
-
-                    {/*  We placed the disabled items in the last */}
-                    {(this.props.isEnterpriseOrCloudOrSKUStarterFree && this.props.isEnterpriseReady) && (
-                        <>
-                            <div className='divider-light'/>
-                            {keywordsWithHighlightSection}
-                        </>
-                    )}
-                    <div className='divider-dark'/>
                 </div>
             </div>
 
         );
     }
 }
-
-const customKeywordsSelectorStyles: ReactSelectStyles = {
-    container: ((baseStyle) => ({
-        ...baseStyle,
-        marginBlockStart: '10px',
-    })),
-    control: ((baseStyles) => ({
-        ...baseStyles,
-        backgroundColor: 'var(--center-channel-bg)',
-        border: '1px solid rgba(var(--center-channel-color-rgb), 0.16);',
-        ':hover': {
-            borderColor: 'rgba(var(--center-channel-color-rgb), 0.48);',
-        },
-    })),
-    multiValue: ((baseStyles) => ({
-        ...baseStyles,
-        background: 'rgba(var(--center-channel-color-rgb), 0.08)',
-    })),
-    multiValueLabel: ((baseStyles) => ({
-        ...baseStyles,
-        color: 'var(--center-channel-color);',
-    })),
-    input: ((baseStyles) => ({
-        ...baseStyles,
-        color: 'var(--center-channel-color)',
-    })),
-    indicatorSeparator: ((indicatorSeperatorStyles) => ({
-        ...indicatorSeperatorStyles,
-        display: 'none',
-    })),
-    multiValueRemove: ((multiValueRemoveStyles) => ({
-        ...multiValueRemoveStyles,
-        cursor: 'pointer',
-        color: 'rgba(var(--center-channel-color-rgb),0.32);',
-        ':hover': {
-            backgroundColor: 'rgba(var(--center-channel-color-rgb), 0.16)',
-            color: 'rgba(var(--center-channel-color-rgb), 0.56);',
-        },
-    })),
-};
 
 const validNotificationLevels = Object.values(NotificationLevels);
 
