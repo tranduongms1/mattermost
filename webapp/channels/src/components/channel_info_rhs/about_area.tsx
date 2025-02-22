@@ -9,7 +9,6 @@ import type {UserProfile} from '@mattermost/types/users';
 
 import Constants from 'utils/constants';
 
-import AboutAreaChannel from './about_area_channel';
 import AboutAreaDM from './about_area_dm';
 import AboutAreaGM from './about_area_gm';
 import type {DMUser} from './channel_info_rhs';
@@ -38,35 +37,21 @@ interface Props {
     channel: Channel;
     dmUser?: DMUser;
     gmUsers?: UserProfile[];
-    canEditChannelProperties: boolean;
-    actions: {
-        editChannelPurpose: () => void;
-        editChannelHeader: () => void;
-    };
 }
 
-const AboutArea = ({channel, dmUser, gmUsers, canEditChannelProperties, actions}: Props) => {
+const AboutArea = ({channel, dmUser, gmUsers}: Props) => {
     return (
         <Container>
             {channel.type === Constants.DM_CHANNEL && dmUser && (
                 <AboutAreaDM
                     channel={channel}
                     dmUser={dmUser}
-                    actions={{editChannelHeader: actions.editChannelHeader}}
                 />
             )}
             {channel.type === Constants.GM_CHANNEL && gmUsers && (
                 <AboutAreaGM
                     channel={channel}
                     gmUsers={gmUsers!}
-                    actions={{editChannelHeader: actions.editChannelHeader}}
-                />
-            )}
-            {[Constants.OPEN_CHANNEL, Constants.PRIVATE_CHANNEL].includes(channel.type) && (
-                <AboutAreaChannel
-                    channel={channel}
-                    canEditChannelProperties={canEditChannelProperties}
-                    actions={actions}
                 />
             )}
         </Container>

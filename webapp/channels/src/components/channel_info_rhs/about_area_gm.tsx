@@ -2,7 +2,6 @@
 // See LICENSE.txt for license information.
 
 import React from 'react';
-import {useIntl} from 'react-intl';
 import styled from 'styled-components';
 
 import type {Channel} from '@mattermost/types/channels';
@@ -10,12 +9,8 @@ import type {UserProfile} from '@mattermost/types/users';
 
 import {Client4} from 'mattermost-redux/client';
 
-import Markdown from 'components/markdown';
 import ProfilePicture from 'components/profile_picture';
 import UserProfileElement from 'components/user_profile';
-
-import EditableArea from './components/editable_area';
-import LineLimiter from './components/linelimiter';
 
 const Usernames = styled.p`
     font-family: Metropolis, sans-serif;
@@ -24,10 +19,13 @@ const Usernames = styled.p`
     color: rgb(var(--center-channel-color-rgb));
     font-weight: 600;
     margin: 0;
+    text-align: center;
 `;
 
 const ProfilePictures = styled.div`
-    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 8px;
 `;
 
 interface ProfilePictureContainerProps {
@@ -51,83 +49,42 @@ const UsersArea = styled.div`
     }
 `;
 
-const ChannelHeader = styled.div`
-    margin-bottom: 12px;
-`;
-
-const ChannelId = styled.div`
-    margin-bottom: 12px;
-    font-size: 11px;
-    line-height: 16px;
-    letter-spacing: 0.02em;
-    color: rgba(var(--center-channel-color-rgb), 0.75);
-`;
-
 interface Props {
     channel: Channel;
     gmUsers: UserProfile[];
-    actions: {
-        editChannelHeader: () => void;
-    };
 }
 
-const AboutAreaGM = ({channel, gmUsers, actions}: Props) => {
-    const {formatMessage} = useIntl();
-
+const AboutAreaGM = ({channel, gmUsers}: Props) => {
     return (
-        <>
-            <UsersArea>
-                <ProfilePictures>
-                    {gmUsers.map((user, idx) => (
-                        <ProfilePictureContainer
-                            key={user.id}
-                            position={idx}
-                        >
-                            <ProfilePicture
-                                src={Client4.getProfilePictureUrl(user.id, user.last_picture_update)}
-                                size='xl'
-                                userId={user.id}
-                                username={user.username}
-                                channelId={channel.id}
-                            />
-                        </ProfilePictureContainer>
-                    ))}
-                </ProfilePictures>
-                <Usernames>
-                    {gmUsers.map((user, i, {length}) => (
-                        <React.Fragment key={user.id}>
-                            <UserProfileElement
-                                userId={user.id}
-                                channelId={channel.id}
-                            />
-                            {(i + 1 !== length) && (<span>{', '}</span>)}
-                        </React.Fragment>
-                    ))}
-                </Usernames>
-            </UsersArea>
-
-            <ChannelHeader>
-                <EditableArea
-                    content={channel.header && (
-                        <LineLimiter
-                            maxLines={4}
-                            lineHeight={20}
-                            moreText={formatMessage({id: 'channel_info_rhs.about_area.channel_header.line_limiter.more', defaultMessage: 'more'})}
-                            lessText={formatMessage({id: 'channel_info_rhs.about_area.channel_header.line_limiter.less', defaultMessage: 'less'})}
-                        >
-                            <Markdown message={channel.header}/>
-                        </LineLimiter>
-                    )}
-                    editable={true}
-                    onEdit={actions.editChannelHeader}
-                    emptyLabel={formatMessage({id: 'channel_info_rhs.about_area.add_channel_header', defaultMessage: 'Add a channel header'})}
-                />
-            </ChannelHeader>
-
-            <ChannelId>
-                {formatMessage({id: 'channel_info_rhs.about_area_id', defaultMessage: 'ID:'})} {channel.id}
-            </ChannelId>
-        </>
+        <UsersArea>
+            <ProfilePictures>
+                {gmUsers.map((user, idx) => (
+                    <ProfilePictureContainer
+                        key={user.id}
+                        position={idx}
+                    >
+                        <ProfilePicture
+                            src={Client4.getProfilePictureUrl(user.id, user.last_picture_update)}
+                            size='xl'
+                            userId={user.id}
+                            username={user.username}
+                            channelId={channel.id}
+                        />
+                    </ProfilePictureContainer>
+                ))}
+            </ProfilePictures>
+            <Usernames>
+                {gmUsers.map((user, i, {length}) => (
+                    <React.Fragment key={user.id}>
+                        <UserProfileElement
+                            userId={user.id}
+                            channelId={channel.id}
+                        />
+                        {(i + 1 !== length) && (<span>{', '}</span>)}
+                    </React.Fragment>
+                ))}
+            </Usernames>
+        </UsersArea>
     );
 };
 

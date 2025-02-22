@@ -10,8 +10,6 @@ import type {UserProfile} from '@mattermost/types/users';
 
 import ChannelInviteModal from 'components/channel_invite_modal';
 import ChannelNotificationsModal from 'components/channel_notifications_modal';
-import EditChannelHeaderModal from 'components/edit_channel_header_modal';
-import EditChannelPurposeModal from 'components/edit_channel_purpose_modal';
 import MoreDirectChannels from 'components/more_direct_channels';
 
 import Constants, {ModalIdentifiers} from 'utils/constants';
@@ -82,7 +80,6 @@ const ChannelInfoRhs = ({
     dmUser,
     channelMembers,
     canManageMembers,
-    canManageProperties,
     actions,
 }: Props) => {
     const currentUserId = currentUser.id;
@@ -120,18 +117,6 @@ const ChannelInfoRhs = ({
         });
     };
 
-    const editChannelPurpose = () => actions.openModal({
-        modalId: ModalIdentifiers.EDIT_CHANNEL_PURPOSE,
-        dialogType: EditChannelPurposeModal,
-        dialogProps: {channel},
-    });
-
-    const editChannelHeader = () => actions.openModal({
-        modalId: ModalIdentifiers.EDIT_CHANNEL_HEADER,
-        dialogType: EditChannelHeaderModal,
-        dialogProps: {channel},
-    });
-
     const openNotificationSettings = () => actions.openModal({
         modalId: ModalIdentifiers.CHANNEL_NOTIFICATIONS,
         dialogType: ChannelNotificationsModal,
@@ -141,8 +126,6 @@ const ChannelInfoRhs = ({
     const gmUsers = channelMembers.filter((user) => {
         return user.id !== currentUser.id;
     });
-
-    const canEditChannelProperties = !isArchived && canManageProperties;
 
     return (
         <div
@@ -156,6 +139,13 @@ const ChannelInfoRhs = ({
                 onClose={actions.closeRightHandSide}
             />
 
+            <AboutArea
+                channel={channel}
+
+                dmUser={dmUser}
+                gmUsers={gmUsers}
+            />
+
             <TopButtons
                 channelType={channel.type}
                 channelURL={channelURL}
@@ -167,20 +157,6 @@ const ChannelInfoRhs = ({
                 canAddPeople={canManageMembers}
 
                 actions={{toggleFavorite, toggleMute, addPeople}}
-            />
-
-            <AboutArea
-                channel={channel}
-
-                dmUser={dmUser}
-                gmUsers={gmUsers}
-
-                canEditChannelProperties={canEditChannelProperties}
-
-                actions={{
-                    editChannelHeader,
-                    editChannelPurpose,
-                }}
             />
 
             <Divider/>

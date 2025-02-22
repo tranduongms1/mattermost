@@ -2,7 +2,6 @@
 // See LICENSE.txt for license information.
 
 import React from 'react';
-import {useIntl} from 'react-intl';
 import styled from 'styled-components';
 
 import type {Channel} from '@mattermost/types/channels';
@@ -15,8 +14,6 @@ import BotTag from 'components/widgets/tag/bot_tag';
 import GuestTag from 'components/widgets/tag/guest_tag';
 
 import type {DMUser} from './channel_info_rhs';
-import EditableArea from './components/editable_area';
-import LineLimiter from './components/linelimiter';
 
 const Username = styled.p`
     font-family: Metropolis, sans-serif;
@@ -27,12 +24,9 @@ const Username = styled.p`
     margin: 0;
 `;
 
-const ChannelHeader = styled.div`
-    margin-bottom: 12px;
-`;
-
 const UserInfoContainer = styled.div`
     display: flex;
+    flex-direction: column;
     align-items: center;
     margin-bottom: 12px;
 `;
@@ -50,9 +44,9 @@ const UserAvatar = styled.div`
 `;
 
 const UserInfo = styled.div`
-    margin-left: 12px;
     display: flex;
     flex-direction: column;
+    margin-top: 8px;
 `;
 
 const UsernameContainer = styled.div`
@@ -68,25 +62,12 @@ const UserPosition = styled.div`
     }
 `;
 
-const ChannelId = styled.div`
-    margin-bottom: 12px;
-    font-size: 11px;
-    line-height: 16px;
-    letter-spacing: 0.02em;
-    color: rgba(var(--center-channel-color-rgb), 0.75);
-`;
-
 interface Props {
     channel: Channel;
     dmUser: DMUser;
-    actions: {
-        editChannelHeader: () => void;
-    };
 }
 
-const AboutAreaDM = ({channel, dmUser, actions}: Props) => {
-    const {formatMessage} = useIntl();
-
+const AboutAreaDM = ({channel, dmUser}: Props) => {
     return (
         <>
             <UserInfoContainer>
@@ -112,30 +93,6 @@ const AboutAreaDM = ({channel, dmUser, actions}: Props) => {
                     </UserPosition>
                 </UserInfo>
             </UserInfoContainer>
-
-            {!dmUser.user.is_bot && (
-                <ChannelHeader>
-                    <EditableArea
-                        content={channel.header && (
-                            <LineLimiter
-                                maxLines={4}
-                                lineHeight={20}
-                                moreText={formatMessage({id: 'channel_info_rhs.about_area.channel_header.line_limiter.more', defaultMessage: 'more'})}
-                                lessText={formatMessage({id: 'channel_info_rhs.about_area.channel_header.line_limiter.less', defaultMessage: 'less'})}
-                            >
-                                <Markdown message={channel.header}/>
-                            </LineLimiter>
-                        )}
-                        editable={true}
-                        onEdit={actions.editChannelHeader}
-                        emptyLabel={formatMessage({id: 'channel_info_rhs.about_area.add_channel_header', defaultMessage: 'Add a channel header'})}
-                    />
-                </ChannelHeader>
-            )}
-
-            <ChannelId>
-                {formatMessage({id: 'channel_info_rhs.about_area_id', defaultMessage: 'ID:'})} {channel.id}
-            </ChannelId>
         </>
     );
 };

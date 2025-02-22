@@ -12,7 +12,6 @@ import Constants from 'utils/constants';
 const ChannelInfoRhsTopButtons = styled.div`
     display: flex;
     color: rgba(var(--center-channel-color-rgb), 0.75);
-    margin-top: 24px;
     padding: 0 18px;
 `;
 
