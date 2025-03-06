@@ -81,29 +81,6 @@ function ThreadFooter({
 
     return (
         <div className='ThreadFooter'>
-            {!isFollowing || threadIsSynthetic(thread) || !thread.unread_replies ? (
-                <div className='indicator'/>
-            ) : (
-                <WithTooltip
-                    id='threadFooterIndicator'
-                    placement='top'
-                    title={
-                        <FormattedMessage
-                            id='threading.numNewMessages'
-                            defaultMessage='{newReplies, plural, =0 {no unread messages} =1 {one unread message} other {# unread messages}}'
-                            values={{newReplies: thread.unread_replies}}
-                        />
-                    }
-                >
-                    <div
-                        className='indicator'
-                        tabIndex={0}
-                    >
-                        <div className='dot-unreads'/>
-                    </div>
-                </WithTooltip>
-            )}
-
             {participantIds && participantIds.length > 0 ? (
                 <Avatars
                     userIds={participantIds}
@@ -126,6 +103,21 @@ function ThreadFooter({
                         defaultMessage='{totalReplies, plural, =0 {Reply} =1 {# reply} other {# replies}}'
                         values={{totalReplies}}
                     />
+                    {isFollowing && !threadIsSynthetic(thread) && thread.unread_replies > 0 && (
+                        <WithTooltip
+                            id='threadFooterIndicator'
+                            placement='top'
+                            title={
+                                <FormattedMessage
+                                    id='threading.numNewMessages'
+                                    defaultMessage='{newReplies, plural, =0 {no unread messages} =1 {one unread message} other {# unread messages}}'
+                                    values={{newReplies: thread.unread_replies}}
+                                />
+                            }
+                        >
+                            <div className='dot-unreads'/>
+                        </WithTooltip>
+                    )}
                 </Button>
             )}
 

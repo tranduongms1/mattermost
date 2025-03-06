@@ -3,7 +3,7 @@
     --button-separator-gap: 4px;
 
     position: relative;
-    left: -34px;
+    left: -9px;
     display: inline-flex;
     width: calc(100% + 15px);
     align-items: center;
@@ -15,17 +15,13 @@
     line-height: 15px;
     white-space: nowrap;
 
-    .indicator {
-        width: 24px;
-        height: 24px;
-        padding: 8px;
-    }
-
     .dot-unreads {
+        display: inline-block;
         width: 8px;
         height: 8px;
         border-radius: 50%;
         background: rgba(var(--sidebar-text-active-border-rgb), 1);
+        margin-left: 0.4em;
     }
 
     .Avatars {
