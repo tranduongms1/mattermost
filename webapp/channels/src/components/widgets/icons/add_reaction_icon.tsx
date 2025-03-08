@@ -9,8 +9,8 @@ export default function AddReactionIcon(props: React.HTMLAttributes<HTMLSpanElem
     return (
         <span {...props}>
             <svg
-                width='16px'
-                height='16px'
+                width='14px'
+                height='14px'
                 viewBox='0 0 16 16'
                 role='img'
                 aria-label={formatMessage({id: 'generic_icons.add-reaction', defaultMessage: 'Add Reaction Icon'})}
