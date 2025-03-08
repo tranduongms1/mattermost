@@ -1258,15 +1258,13 @@
 
     .post__content {
         position: relative;
-        display: table;
+        display: flex;
         width: 100%;
         padding: 0 8px 0 5px; // if the left margin changes, the margin of post-pre-header__icons-container needs to be adjusted accordingly
         margin: 0 auto;
-        table-layout: fixed;
 
-        > div {
-            display: table-cell;
-            vertical-align: top;
+        .post__img + div {
+            max-width: calc(100% - 42px);
         }
     }
 
@@ -1446,9 +1444,16 @@
     }
 
     .post__body {
-        width: 100%;
+        display: flex;
+        flex-direction: column;
+        max-width: 100%;
         padding: 0 0 0.2em;
         word-wrap: break-word;
+
+        .AutoHeight {
+            width: fit-content !important;
+            max-width: 100%;
+        }
 
         &-reactions-acks {
             display: flex;
@@ -2101,7 +2106,15 @@
 }
 
 .post-message__text {
+    background-color: rgba(var(--center-channel-color-rgb), 0.04);
+    border: 1px solid rgba(var(--center-channel-color-rgb), 0.08);
+    border-radius: 10px;
+    padding: 10px 10px;
     text-align: left;
+    
+    &:not(:has(table)) {
+        max-width: 600px;
+    }
 }
 
 .view-history__text {
@@ -2361,6 +2374,71 @@
                     color: var(--button-bg);
                 }
             }
+        }
+    }
+
+    .post__content {
+        flex-direction: row-reverse;
+    }
+
+    .post__img {
+        display: none;
+    }
+
+    .post__body {
+        align-items: flex-end;
+    }
+
+    .post__header {
+        .col__name {
+            display: none;
+        }
+
+        .d-flex {
+            justify-content: right;
+        }
+    }
+
+    .post-message__text {
+        background-color: rgba(0, 123, 255, 0.12);
+    }
+
+    .post-reaction-list {
+        flex-direction: row-reverse;
+
+        .Reaction {
+            margin: 0 0 4px 4px;
+        }
+    }
+
+    .ThreadFooter {
+        flex-direction: row-reverse;
+        left: 25px;
+
+        .Avatars {
+            margin-left: 2px;
+            margin-right: 0;
+        }
+
+        .separated + .separated {
+            margin-left: 0;
+            margin-right: var(--button-separator-gap, 0);
+        }
+
+        .separated:not(.Button),
+        .separated:not(:hover):not(.is-active) {
+            + .separated:not(.Button),
+            + .separated:not(:hover):not(.is-active) {
+                &::before {
+                    left: unset;
+                    right: calc(-0.5px - var(--button-separator-gap, 0px) / 2);
+                }
+            }
+        }
+
+        .Timestamp {
+            padding-left: 0;
+            padding-right: 1rem;
         }
     }
 }
