@@ -138,6 +138,8 @@ export default class PostMessageView extends React.PureComponent<Props, State> {
 
         const id = isRHS ? `rhsPostMessageText_${post.id}` : `postMessageText_${post.id}`;
 
+        if (!message) return null;
+
         return (
             <ShowMore
                 checkOverflow={this.state.checkOverflow}
