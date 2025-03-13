@@ -192,7 +192,6 @@ function createGMIntroMessage(
         const actionButtons = (
             <div className='channel-intro__actions'>
                 {createFavoriteButton(isFavorite, toggleFavorite)}
-                {createSetHeaderButton(channel)}
                 {!isMobileView && createNotificationPreferencesButton(channel, currentUser)}
                 <PluggableIntroButtons channel={channel}/>
             </div>
