@@ -35,7 +35,6 @@ import * as UserAgent from 'utils/user_agent';
 import type {ModalData} from 'types/actions';
 import type {PluginComponent} from 'types/store/plugins';
 
-import LearnAboutTeamsLink from './learn_about_teams_link';
 import './main_menu.scss';
 
 export type Props = {
@@ -520,11 +519,6 @@ export class MainMenu extends React.PureComponent<Props> {
                             )}
                         />
                     </SystemPermissionGate>
-                    <Menu.Group>
-                        <div className='MainMenu_dropdown-link'>
-                            <LearnAboutTeamsLink/>
-                        </div>
-                    </Menu.Group>
                 </Menu.Group>
                 <Menu.Group>
                     {pluginItems}
