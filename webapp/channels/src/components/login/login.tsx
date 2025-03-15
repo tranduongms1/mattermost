@@ -7,14 +7,14 @@ import React, {useState, useEffect, useRef, useCallback} from 'react';
 import type {FormEvent} from 'react';
 import {useIntl} from 'react-intl';
 import {useSelector, useDispatch} from 'react-redux';
-import {Link, useLocation, useHistory, Route} from 'react-router-dom';
+import {Link, useLocation, useHistory} from 'react-router-dom';
 
 import type {Team} from '@mattermost/types/teams';
 
 import {loadMe} from 'mattermost-redux/actions/users';
 import {Client4} from 'mattermost-redux/client';
 import {RequestStatus} from 'mattermost-redux/constants';
-import {getConfig, getLicense} from 'mattermost-redux/selectors/entities/general';
+import {getConfig} from 'mattermost-redux/selectors/entities/general';
 import {getIsOnboardingFlowEnabled} from 'mattermost-redux/selectors/entities/preferences';
 import {getTeamByName, getMyTeamMember} from 'mattermost-redux/selectors/entities/teams';
 import {getCurrentUser} from 'mattermost-redux/selectors/entities/users';
@@ -28,22 +28,13 @@ import LocalStorageStore from 'stores/local_storage_store';
 import AlertBanner from 'components/alert_banner';
 import type {ModeType, AlertBannerProps} from 'components/alert_banner';
 import type {SubmitOptions} from 'components/claim/components/email_to_ldap';
-import WomanWithChatsSVG from 'components/common/svg_images_components/woman_with_chats_svg';
-import DesktopAuthToken from 'components/desktop_auth_token';
 import ExternalLink from 'components/external_link';
-import ExternalLoginButton from 'components/external_login_button/external_login_button';
-import type {ExternalLoginButtonType} from 'components/external_login_button/external_login_button';
 import AlternateLinkLayout from 'components/header_footer_route/content_layouts/alternate_link';
 import ColumnLayout from 'components/header_footer_route/content_layouts/column';
 import type {CustomizeHeaderType} from 'components/header_footer_route/header_footer_route';
 import LoadingScreen from 'components/loading_screen';
 import Markdown from 'components/markdown';
 import SaveButton from 'components/save_button';
-import EntraIdIcon from 'components/widgets/icons/entra_id_icon';
-import LockIcon from 'components/widgets/icons/lock_icon';
-import LoginGitlabIcon from 'components/widgets/icons/login_gitlab_icon';
-import LoginGoogleIcon from 'components/widgets/icons/login_google_icon';
-import LoginOpenIDIcon from 'components/widgets/icons/login_openid_icon';
 import Input, {SIZE} from 'components/widgets/inputs/input/input';
 import PasswordInput from 'components/widgets/inputs/password_input/password_input';
 
@@ -51,7 +42,6 @@ import Constants from 'utils/constants';
 import DesktopApp from 'utils/desktop_api';
 import {t} from 'utils/i18n';
 import {showNotification} from 'utils/notifications';
-import {isDesktopApp} from 'utils/user_agent';
 import {setCSRFFromCookie} from 'utils/utils';
 
 import type {GlobalState} from 'types/store';
@@ -77,23 +67,11 @@ const Login = ({onCustomizeHeader}: LoginProps) => {
     const emailParam = searchParam.get('email');
 
     const {
-        EnableLdap,
-        EnableSaml,
         EnableSignInWithEmail,
         EnableSignInWithUsername,
         EnableSignUpWithEmail,
-        EnableSignUpWithGitLab,
-        EnableSignUpWithOffice365,
-        EnableSignUpWithGoogle,
-        EnableSignUpWithOpenId,
         EnableOpenServer,
         EnableUserCreation,
-        LdapLoginFieldName,
-        GitLabButtonText,
-        GitLabButtonColor,
-        OpenIdButtonText,
-        OpenIdButtonColor,
-        SamlLoginButtonText,
         EnableCustomBrand,
         CustomBrandText,
         CustomDescriptionText,
@@ -102,7 +80,6 @@ const Login = ({onCustomizeHeader}: LoginProps) => {
         ForgotPasswordLink,
         PasswordEnableForgotLink,
     } = useSelector(getConfig);
-    const {IsLicensed} = useSelector(getLicense);
     const initializing = useSelector((state: GlobalState) => state.requests.users.logout.status === RequestStatus.SUCCESS || !state.storage.initialized);
     const currentUser = useSelector(getCurrentUser);
     const experimentalPrimaryTeam = useSelector((state: GlobalState) => (ExperimentalPrimaryTeam ? getTeamByName(state, ExperimentalPrimaryTeam) : undefined));
@@ -124,109 +101,18 @@ const Login = ({onCustomizeHeader}: LoginProps) => {
     const [isMobileView, setIsMobileView] = useState(false);
 
     const enableCustomBrand = EnableCustomBrand === 'true';
-    const enableLdap = EnableLdap === 'true';
     const enableOpenServer = EnableOpenServer === 'true';
     const enableUserCreation = EnableUserCreation === 'true';
-    const enableSaml = EnableSaml === 'true';
     const enableSignInWithEmail = EnableSignInWithEmail === 'true';
     const enableSignInWithUsername = EnableSignInWithUsername === 'true';
     const enableSignUpWithEmail = enableUserCreation && EnableSignUpWithEmail === 'true';
-    const enableSignUpWithGitLab = EnableSignUpWithGitLab === 'true';
-    const enableSignUpWithGoogle = EnableSignUpWithGoogle === 'true';
-    const enableSignUpWithOffice365 = EnableSignUpWithOffice365 === 'true';
-    const enableSignUpWithOpenId = EnableSignUpWithOpenId === 'true';
-    const isLicensed = IsLicensed === 'true';
-    const ldapEnabled = isLicensed && enableLdap;
-    const enableSignUpWithSaml = isLicensed && enableSaml;
     const siteName = SiteName ?? '';
 
-    const enableBaseLogin = enableSignInWithEmail || enableSignInWithUsername || ldapEnabled;
-    const enableExternalSignup = enableSignUpWithGitLab || enableSignUpWithOffice365 || enableSignUpWithGoogle || enableSignUpWithOpenId || enableSignUpWithSaml;
-    const showSignup = enableOpenServer && (enableExternalSignup || enableSignUpWithEmail || enableLdap);
-    const onlyLdapEnabled = enableLdap && !(enableSaml || enableSignInWithEmail || enableSignInWithUsername || enableSignUpWithEmail || enableSignUpWithGitLab || enableSignUpWithGoogle || enableSignUpWithOffice365 || enableSignUpWithOpenId);
+    const enableBaseLogin = enableSignInWithEmail || enableSignInWithUsername;
+    const showSignup = enableOpenServer && enableSignUpWithEmail;
 
     const query = new URLSearchParams(search);
     const redirectTo = query.get('redirect_to');
-
-    const [desktopLoginLink, setDesktopLoginLink] = useState('');
-
-    const getExternalLoginOptions = () => {
-        const externalLoginOptions: ExternalLoginButtonType[] = [];
-
-        if (!enableExternalSignup) {
-            return externalLoginOptions;
-        }
-
-        if (enableSignUpWithGitLab) {
-            const url = `${Client4.getOAuthRoute()}/gitlab/login${search}`;
-            externalLoginOptions.push({
-                id: 'gitlab',
-                url,
-                icon: <LoginGitlabIcon/>,
-                label: GitLabButtonText || formatMessage({id: 'login.gitlab', defaultMessage: 'GitLab'}),
-                style: {color: GitLabButtonColor, borderColor: GitLabButtonColor},
-                onClick: desktopExternalAuth(url),
-            });
-        }
-
-        if (enableSignUpWithGoogle) {
-            const url = `${Client4.getOAuthRoute()}/google/login${search}`;
-            externalLoginOptions.push({
-                id: 'google',
-                url,
-                icon: <LoginGoogleIcon/>,
-                label: formatMessage({id: 'login.google', defaultMessage: 'Google'}),
-                onClick: desktopExternalAuth(url),
-            });
-        }
-
-        if (enableSignUpWithOffice365) {
-            const url = `${Client4.getOAuthRoute()}/office365/login${search}`;
-            externalLoginOptions.push({
-                id: 'office365',
-                url,
-                icon: <EntraIdIcon/>,
-                label: formatMessage({id: 'login.office365', defaultMessage: 'Entra ID'}),
-                onClick: desktopExternalAuth(url),
-            });
-        }
-
-        if (enableSignUpWithOpenId) {
-            const url = `${Client4.getOAuthRoute()}/openid/login${search}`;
-            externalLoginOptions.push({
-                id: 'openid',
-                url,
-                icon: <LoginOpenIDIcon/>,
-                label: OpenIdButtonText || formatMessage({id: 'login.openid', defaultMessage: 'Open ID'}),
-                style: {color: OpenIdButtonColor, borderColor: OpenIdButtonColor},
-                onClick: desktopExternalAuth(url),
-            });
-        }
-
-        if (enableSignUpWithSaml) {
-            const url = `${Client4.getUrl()}/login/sso/saml${search}`;
-            externalLoginOptions.push({
-                id: 'saml',
-                url,
-                icon: <LockIcon/>,
-                label: SamlLoginButtonText || formatMessage({id: 'login.saml', defaultMessage: 'SAML'}),
-                onClick: desktopExternalAuth(url),
-            });
-        }
-
-        return externalLoginOptions;
-    };
-
-    const desktopExternalAuth = (href: string) => {
-        return (event: React.MouseEvent) => {
-            if (isDesktopApp()) {
-                event.preventDefault();
-
-                setDesktopLoginLink(href);
-                history.push(`/login/desktop${search}`);
-            }
-        };
-    };
 
     const dismissAlert = () => {
         setAlertBanner(null);
@@ -476,10 +362,6 @@ const Login = ({onCustomizeHeader}: LoginProps) => {
             loginPlaceholders.push(formatMessage({id: 'login.username', defaultMessage: 'Username'}));
         }
 
-        if (ldapEnabled) {
-            loginPlaceholders.push(LdapLoginFieldName || formatMessage({id: 'login.ldapUsername', defaultMessage: 'AD/LDAP Username'}));
-        }
-
         if (loginPlaceholders.length > 1) {
             const lastIndex = loginPlaceholders.length - 1;
             return `${loginPlaceholders.slice(0, lastIndex).join(', ')}${formatMessage({id: 'login.placeholderOr', defaultMessage: ' or '})}${loginPlaceholders[lastIndex]}`;
@@ -540,15 +422,11 @@ const Login = ({onCustomizeHeader}: LoginProps) => {
             if (enableSignInWithUsername) {
                 msgId += 'Username';
             }
-            if (ldapEnabled) {
-                msgId += 'LdapUsername';
-            }
 
             setAlertBanner({
                 mode: 'danger',
                 title: formatMessage(
                     {id: msgId},
-                    {ldapUsername: LdapLoginFieldName || formatMessage({id: 'login.ldapUsernameLower', defaultMessage: 'AD/LDAP username'})},
                 ),
             });
             setHasError(true);
@@ -713,10 +591,6 @@ const Login = ({onCustomizeHeader}: LoginProps) => {
             return CustomDescriptionText;
         }
 
-        if (!enableBaseLogin && enableExternalSignup) {
-            return formatMessage({id: 'login.cardtitle.external', defaultMessage: 'Log in with one of the following:'});
-        }
-
         return formatMessage({id: 'login.cardtitle', defaultMessage: 'Log in'});
     };
 
@@ -740,7 +614,7 @@ const Login = ({onCustomizeHeader}: LoginProps) => {
     };
 
     const getResetPasswordLink = () => {
-        if (!PasswordEnableForgotLink || PasswordEnableForgotLink === 'false' || onlyLdapEnabled) {
+        if (!PasswordEnableForgotLink || PasswordEnableForgotLink === 'false') {
             return null;
         }
 
@@ -781,25 +655,11 @@ const Login = ({onCustomizeHeader}: LoginProps) => {
             );
         }
 
-        if (!enableBaseLogin && !enableExternalSignup) {
+        if (!enableBaseLogin) {
             return (
                 <ColumnLayout
                     title={formatMessage({id: 'login.noMethods.title', defaultMessage: 'This server doesn’t have any sign-in methods enabled'})}
                     message={formatMessage({id: 'login.noMethods.subtitle', defaultMessage: 'Please contact your System Administrator to resolve this.'})}
-                />
-            );
-        }
-
-        if (desktopLoginLink || query.get('server_token')) {
-            return (
-                <Route
-                    path={'/login/desktop'}
-                    render={() => (
-                        <DesktopAuthToken
-                            href={desktopLoginLink}
-                            onLogin={postSubmit}
-                        />
-                    )}
                 />
             );
         }
@@ -829,11 +689,6 @@ const Login = ({onCustomizeHeader}: LoginProps) => {
                         </h1>
                     )}
                     {getMessageSubtitle()}
-                    {!enableCustomBrand && (
-                        <div className='login-body-message-svg'>
-                            <WomanWithChatsSVG width={270}/>
-                        </div>
-                    )}
                 </div>
                 <div className='login-body-action'>
                     {!isMobileView && getAlternateLink()}
@@ -893,24 +748,6 @@ const Login = ({onCustomizeHeader}: LoginProps) => {
                                         />
                                     </div>
                                 </form>
-                            )}
-                            {enableBaseLogin && enableExternalSignup && (
-                                <div className='login-body-card-form-divider'>
-                                    <span className='login-body-card-form-divider-label'>
-                                        {formatMessage({id: 'login.or', defaultMessage: 'or log in with'})}
-                                    </span>
-                                </div>
-                            )}
-                            {enableExternalSignup && (
-                                <div className={classNames('login-body-card-form-login-options', {column: !enableBaseLogin})}>
-                                    {getExternalLoginOptions().map((option) => (
-                                        <ExternalLoginButton
-                                            key={option.id}
-                                            direction={enableBaseLogin ? undefined : 'column'}
-                                            {...option}
-                                        />
-                                    ))}
-                                </div>
                             )}
                         </div>
                     </div>

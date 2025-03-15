@@ -7,7 +7,7 @@ import React, {useState, useEffect, useRef, useCallback} from 'react';
 import type {FocusEvent} from 'react';
 import {useIntl} from 'react-intl';
 import {useSelector, useDispatch} from 'react-redux';
-import {useLocation, useHistory, Route} from 'react-router-dom';
+import {useLocation, useHistory} from 'react-router-dom';
 
 import type {ServerError} from '@mattermost/types/errors';
 import type {UserProfile} from '@mattermost/types/users';
@@ -15,7 +15,7 @@ import type {UserProfile} from '@mattermost/types/users';
 import {getTeamInviteInfo} from 'mattermost-redux/actions/teams';
 import {createUser, loadMe} from 'mattermost-redux/actions/users';
 import {Client4} from 'mattermost-redux/client';
-import {getConfig, getLicense, getPasswordConfig} from 'mattermost-redux/selectors/entities/general';
+import {getConfig, getPasswordConfig} from 'mattermost-redux/selectors/entities/general';
 import {getIsOnboardingFlowEnabled} from 'mattermost-redux/selectors/entities/preferences';
 import {getCurrentUserId} from 'mattermost-redux/selectors/entities/users';
 import {isEmail} from 'mattermost-redux/utils/helpers';
@@ -29,13 +29,7 @@ import {getGlobalItem} from 'selectors/storage';
 
 import AlertBanner from 'components/alert_banner';
 import type {ModeType, AlertBannerProps} from 'components/alert_banner';
-import useCWSAvailabilityCheck, {CSWAvailabilityCheckTypes} from 'components/common/hooks/useCWSAvailabilityCheck';
 import LaptopAlertSVG from 'components/common/svg_images_components/laptop_alert_svg';
-import ManWithLaptopSVG from 'components/common/svg_images_components/man_with_laptop_svg';
-import DesktopAuthToken from 'components/desktop_auth_token';
-import ExternalLink from 'components/external_link';
-import ExternalLoginButton from 'components/external_login_button/external_login_button';
-import type {ExternalLoginButtonType} from 'components/external_login_button/external_login_button';
 import FormattedMarkdownMessage from 'components/formatted_markdown_message';
 import AlternateLinkLayout from 'components/header_footer_route/content_layouts/alternate_link';
 import ColumnLayout from 'components/header_footer_route/content_layouts/column';
@@ -43,19 +37,12 @@ import type {CustomizeHeaderType} from 'components/header_footer_route/header_fo
 import LoadingScreen from 'components/loading_screen';
 import Markdown from 'components/markdown';
 import SaveButton from 'components/save_button';
-import EntraIdIcon from 'components/widgets/icons/entra_id_icon';
-import LockIcon from 'components/widgets/icons/lock_icon';
-import LoginGitlabIcon from 'components/widgets/icons/login_gitlab_icon';
-import LoginGoogleIcon from 'components/widgets/icons/login_google_icon';
-import LoginOpenIDIcon from 'components/widgets/icons/login_openid_icon';
-import CheckInput from 'components/widgets/inputs/check';
 import Input, {SIZE} from 'components/widgets/inputs/input/input';
 import type {CustomMessageInputType} from 'components/widgets/inputs/input/input';
 import PasswordInput from 'components/widgets/inputs/password_input/password_input';
 
-import {Constants, HostedCustomerLinks, ItemStatus, ValidationErrors} from 'utils/constants';
+import {Constants, ItemStatus, ValidationErrors} from 'utils/constants';
 import {isValidPassword} from 'utils/password';
-import {isDesktopApp} from 'utils/user_agent';
 import {isValidUsername, getRoleFromTrackFlow, getMediumFromTrackFlow} from 'utils/utils';
 
 import type {GlobalState} from 'types/store';
@@ -88,26 +75,13 @@ const Signup = ({onCustomizeHeader}: SignupProps) => {
         EnableUserCreation,
         NoAccounts,
         EnableSignUpWithEmail,
-        EnableSignUpWithGitLab,
-        EnableSignUpWithGoogle,
-        EnableSignUpWithOffice365,
-        EnableSignUpWithOpenId,
-        EnableLdap,
-        EnableSaml,
-        SamlLoginButtonText,
-        LdapLoginFieldName,
         SiteName,
         CustomDescriptionText,
-        GitLabButtonText,
-        GitLabButtonColor,
-        OpenIdButtonText,
-        OpenIdButtonColor,
         EnableCustomBrand,
         CustomBrandText,
         TermsOfServiceLink,
         PrivacyPolicyLink,
     } = config;
-    const {IsLicensed} = useSelector(getLicense);
     const loggedIn = Boolean(useSelector(getCurrentUserId));
     const onboardingFlowEnabled = useSelector(getIsOnboardingFlowEnabled);
     const usedBefore = useSelector((state: GlobalState) => (!inviteId && !loggedIn && token ? getGlobalItem(state, token, null) : undefined));
@@ -116,17 +90,10 @@ const Signup = ({onCustomizeHeader}: SignupProps) => {
     const nameInput = useRef<HTMLInputElement>(null);
     const passwordInput = useRef<HTMLInputElement>(null);
 
-    const isLicensed = IsLicensed === 'true';
     const enableOpenServer = EnableOpenServer === 'true';
     const enableUserCreation = EnableUserCreation === 'true';
     const noAccounts = NoAccounts === 'true';
     const enableSignUpWithEmail = enableUserCreation && EnableSignUpWithEmail === 'true';
-    const enableSignUpWithGitLab = enableUserCreation && EnableSignUpWithGitLab === 'true';
-    const enableSignUpWithGoogle = enableUserCreation && EnableSignUpWithGoogle === 'true';
-    const enableSignUpWithOffice365 = enableUserCreation && EnableSignUpWithOffice365 === 'true';
-    const enableSignUpWithOpenId = enableUserCreation && EnableSignUpWithOpenId === 'true';
-    const enableLDAP = EnableLdap === 'true';
-    const enableSAML = EnableSaml === 'true';
     const enableCustomBrand = EnableCustomBrand === 'true';
 
     const noOpenServer = !inviteId && !token && !enableOpenServer && !noAccounts && !enableUserCreation;
@@ -144,109 +111,10 @@ const Signup = ({onCustomizeHeader}: SignupProps) => {
     const [teamName, setTeamName] = useState(parsedTeamName ?? '');
     const [alertBanner, setAlertBanner] = useState<AlertBannerProps | null>(null);
     const [isMobileView, setIsMobileView] = useState(false);
-    const [subscribeToSecurityNewsletter, setSubscribeToSecurityNewsletter] = useState(false);
 
-    const cwsAvailability = useCWSAvailabilityCheck();
-
-    const enableExternalSignup = enableSignUpWithGitLab || enableSignUpWithOffice365 || enableSignUpWithGoogle || enableSignUpWithOpenId || enableLDAP || enableSAML;
     const hasError = Boolean(emailError || nameError || passwordError || serverError || alertBanner);
     const canSubmit = Boolean(email && name && password) && !hasError && !loading;
     const passwordConfig = useSelector(getPasswordConfig);
-    const {error: passwordInfo} = isValidPassword('', passwordConfig, intl);
-
-    const [desktopLoginLink, setDesktopLoginLink] = useState('');
-
-    const subscribeToSecurityNewsletterFunc = () => {
-        try {
-            Client4.subscribeToNewsletter({email, subscribed_content: 'security_newsletter'});
-        } catch (error) {
-            // eslint-disable-next-line no-console
-            console.error(error);
-        }
-    };
-
-    const getExternalSignupOptions = () => {
-        const externalLoginOptions: ExternalLoginButtonType[] = [];
-
-        if (!enableExternalSignup) {
-            return externalLoginOptions;
-        }
-
-        if (enableSignUpWithGitLab) {
-            const url = `${Client4.getOAuthRoute()}/gitlab/signup${search}`;
-            externalLoginOptions.push({
-                id: 'gitlab',
-                url,
-                icon: <LoginGitlabIcon/>,
-                label: GitLabButtonText || formatMessage({id: 'login.gitlab', defaultMessage: 'GitLab'}),
-                style: {color: GitLabButtonColor, borderColor: GitLabButtonColor},
-                onClick: desktopExternalAuth(url),
-            });
-        }
-
-        if (isLicensed && enableSignUpWithGoogle) {
-            const url = `${Client4.getOAuthRoute()}/google/signup${search}`;
-            externalLoginOptions.push({
-                id: 'google',
-                url,
-                icon: <LoginGoogleIcon/>,
-                label: formatMessage({id: 'login.google', defaultMessage: 'Google'}),
-                onClick: desktopExternalAuth(url),
-            });
-        }
-
-        if (isLicensed && enableSignUpWithOffice365) {
-            const url = `${Client4.getOAuthRoute()}/office365/signup${search}`;
-            externalLoginOptions.push({
-                id: 'office365',
-                url,
-                icon: <EntraIdIcon/>,
-                label: formatMessage({id: 'login.office365', defaultMessage: 'Entra ID'}),
-                onClick: desktopExternalAuth(url),
-            });
-        }
-
-        if (isLicensed && enableSignUpWithOpenId) {
-            const url = `${Client4.getOAuthRoute()}/openid/signup${search}`;
-            externalLoginOptions.push({
-                id: 'openid',
-                url,
-                icon: <LoginOpenIDIcon/>,
-                label: OpenIdButtonText || formatMessage({id: 'login.openid', defaultMessage: 'Open ID'}),
-                style: {color: OpenIdButtonColor, borderColor: OpenIdButtonColor},
-                onClick: desktopExternalAuth(url),
-            });
-        }
-
-        if (isLicensed && enableLDAP) {
-            const newSearchParam = new URLSearchParams(search);
-            newSearchParam.set('extra', Constants.CREATE_LDAP);
-
-            externalLoginOptions.push({
-                id: 'ldap',
-                url: `${Client4.getUrl()}/login?${newSearchParam.toString()}`,
-                icon: <LockIcon/>,
-                label: LdapLoginFieldName || formatMessage({id: 'signup.ldap', defaultMessage: 'AD/LDAP Credentials'}),
-                onClick: () => {},
-            });
-        }
-
-        if (isLicensed && enableSAML) {
-            const newSearchParam = new URLSearchParams(search);
-            newSearchParam.set('action', 'signup');
-
-            const url = `${Client4.getUrl()}/login/sso/saml?${newSearchParam.toString()}`;
-            externalLoginOptions.push({
-                id: 'saml',
-                url,
-                icon: <LockIcon/>,
-                label: SamlLoginButtonText || formatMessage({id: 'login.saml', defaultMessage: 'SAML'}),
-                onClick: desktopExternalAuth(url),
-            });
-        }
-
-        return externalLoginOptions;
-    };
 
     const handleHeaderBackButtonOnClick = useCallback(() => {
         if (!noAccounts) {
@@ -314,17 +182,6 @@ const Signup = ({onCustomizeHeader}: SignupProps) => {
         setIsMobileView(window.innerWidth < MOBILE_SCREEN_WIDTH);
     }, 100);
 
-    const desktopExternalAuth = (href: string) => {
-        return (event: React.MouseEvent) => {
-            if (isDesktopApp()) {
-                event.preventDefault();
-
-                setDesktopLoginLink(href);
-                history.push(`/signup_user_complete/desktop${search}`);
-            }
-        };
-    };
-
     useEffect(() => {
         dispatch(removeGlobalItem('team'));
         trackEvent('signup', 'signup_user_01_welcome', {...getRoleFromTrackFlow(), ...getMediumFromTrackFlow()});
@@ -388,10 +245,6 @@ const Signup = ({onCustomizeHeader}: SignupProps) => {
     const getCardTitle = () => {
         if (CustomDescriptionText) {
             return CustomDescriptionText;
-        }
-
-        if (!enableSignUpWithEmail && enableExternalSignup) {
-            return formatMessage({id: 'signup_user_completed.cardtitle.external', defaultMessage: 'Create your account with one of the following:'});
         }
 
         return formatMessage({id: 'signup_user_completed.cardtitle', defaultMessage: 'Create your account'});
@@ -611,77 +464,12 @@ const Signup = ({onCustomizeHeader}: SignupProps) => {
             }
 
             await handleSignupSuccess(user, data!);
-            if (subscribeToSecurityNewsletter) {
-                subscribeToSecurityNewsletterFunc();
-            }
         } else {
             setIsWaiting(false);
         }
     };
 
     const handleReturnButtonOnClick = () => history.replace('/');
-
-    const getNewsletterCheck = () => {
-        if (cwsAvailability === CSWAvailabilityCheckTypes.Available) {
-            return (
-                <CheckInput
-                    id='signup-body-card-form-check-newsletter'
-                    ariaLabel={formatMessage({id: 'newsletter_optin.checkmark.box', defaultMessage: 'newsletter checkbox'})}
-                    name='newsletter'
-                    onChange={() => setSubscribeToSecurityNewsletter(!subscribeToSecurityNewsletter)}
-                    text={
-                        formatMessage(
-                            {id: 'newsletter_optin.checkmark.text', defaultMessage: '<span>I would like to receive Mattermost security updates via newsletter.</span> By subscribing, I consent to receive emails from Mattermost with product updates, promotions, and company news. I have read the <a>Privacy Policy</a> and understand that I can <aa>unsubscribe</aa> at any time'},
-                            {
-                                a: (chunks: React.ReactNode | React.ReactNodeArray) => (
-                                    <ExternalLink
-                                        location='signup-newsletter-checkmark'
-                                        href={HostedCustomerLinks.PRIVACY}
-                                    >
-                                        {chunks}
-                                    </ExternalLink>
-                                ),
-                                aa: (chunks: React.ReactNode | React.ReactNodeArray) => (
-                                    <ExternalLink
-                                        location='signup-newsletter-checkmark'
-                                        href={HostedCustomerLinks.NEWSLETTER_UNSUBSCRIBE_LINK}
-                                    >
-                                        {chunks}
-                                    </ExternalLink>
-                                ),
-                                span: (chunks: React.ReactNode | React.ReactNodeArray) => (
-                                    <span className='header'>{chunks}</span>
-                                ),
-                            },
-                        )}
-                    checked={subscribeToSecurityNewsletter}
-                />
-            );
-        }
-        return (
-            <div className='newsletter'>
-                <span className='interested'>
-                    {formatMessage({id: 'newsletter_optin.title', defaultMessage: 'Interested in receiving Mattermost security, product, promotions, and company updates updates via newsletter?'})}
-                </span>
-                <span className='link'>
-                    {formatMessage(
-                        {id: 'newsletter_optin.desc', defaultMessage: 'Sign up at <a>{link}</a>.'},
-                        {
-                            link: HostedCustomerLinks.SECURITY_UPDATES,
-                            a: (chunks: React.ReactNode | React.ReactNodeArray) => (
-                                <ExternalLink
-                                    location='signup'
-                                    href={HostedCustomerLinks.SECURITY_UPDATES}
-                                >
-                                    {chunks}
-                                </ExternalLink>
-                            ),
-                        },
-                    )}
-                </span>
-            </div>
-        );
-    };
 
     const handleOnBlur = (e: FocusEvent<HTMLInputElement | HTMLTextAreaElement>, inputId: string) => {
         const text = e.target.value;
@@ -692,7 +480,7 @@ const Signup = ({onCustomizeHeader}: SignupProps) => {
     };
 
     const getContent = () => {
-        if (!enableSignUpWithEmail && !enableExternalSignup) {
+        if (!enableSignUpWithEmail) {
             return (
                 <ColumnLayout
                     title={formatMessage({id: 'login.noMethods.title', defaultMessage: 'This server doesn’t have any sign-in methods enabled'})}
@@ -723,20 +511,6 @@ const Signup = ({onCustomizeHeader}: SignupProps) => {
                                 {formatMessage({id: 'signup_user_completed.return', defaultMessage: 'Return to log in'})}
                             </button>
                         </div>
-                    )}
-                />
-            );
-        }
-
-        if (desktopLoginLink) {
-            return (
-                <Route
-                    path={'/signup_user_complete/desktop'}
-                    render={() => (
-                        <DesktopAuthToken
-                            href={desktopLoginLink}
-                            onLogin={postSignupSuccess}
-                        />
                     )}
                 />
             );
@@ -783,11 +557,6 @@ const Signup = ({onCustomizeHeader}: SignupProps) => {
                         </h1>
                     )}
                     {getMessageSubtitle()}
-                    {!enableCustomBrand && (
-                        <div className='signup-body-message-svg'>
-                            <ManWithLaptopSVG/>
-                        </div>
-                    )}
                 </div>
                 <div className='signup-body-action'>
                     {!isMobileView && getAlternateLink()}
@@ -842,12 +611,7 @@ const Signup = ({onCustomizeHeader}: SignupProps) => {
                                         })}
                                         disabled={isWaiting}
                                         autoFocus={Boolean(parsedEmail)}
-                                        customMessage={
-                                            nameError ? {type: ItemStatus.ERROR, value: nameError} : {
-                                                type: ItemStatus.INFO,
-                                                value: formatMessage({id: 'signup_user_completed.userHelp', defaultMessage: 'You can use lowercase letters, numbers, periods, dashes, and underscores.'}),
-                                            }
-                                        }
+                                        customMessage={nameError ? {type: ItemStatus.ERROR, value: nameError} : null}
                                         onBlur={(e) => handleOnBlur(e, 'username')}
                                     />
                                     <PasswordInput
@@ -858,11 +622,9 @@ const Signup = ({onCustomizeHeader}: SignupProps) => {
                                         onChange={handlePasswordInputOnChange}
                                         disabled={isWaiting}
                                         createMode={true}
-                                        info={passwordInfo as string}
                                         error={passwordError}
                                         onBlur={(e) => handleOnBlur(e, 'password')}
                                     />
-                                    {getNewsletterCheck()}
                                     <SaveButton
                                         extraClasses='signup-body-card-form-button-submit large'
                                         saving={isWaiting}
@@ -871,24 +633,6 @@ const Signup = ({onCustomizeHeader}: SignupProps) => {
                                         defaultMessage={formatMessage({id: 'signup_user_completed.create', defaultMessage: 'Create account'})}
                                         savingMessage={formatMessage({id: 'signup_user_completed.saving', defaultMessage: 'Creating account…'})}
                                     />
-                                </div>
-                            )}
-                            {enableSignUpWithEmail && enableExternalSignup && (
-                                <div className='signup-body-card-form-divider'>
-                                    <span className='signup-body-card-form-divider-label'>
-                                        {formatMessage({id: 'signup_user_completed.or', defaultMessage: 'or create an account with'})}
-                                    </span>
-                                </div>
-                            )}
-                            {enableExternalSignup && (
-                                <div className={classNames('signup-body-card-form-login-options', {column: !enableSignUpWithEmail})}>
-                                    {getExternalSignupOptions().map((option) => (
-                                        <ExternalLoginButton
-                                            key={option.id}
-                                            direction={enableSignUpWithEmail ? undefined : 'column'}
-                                            {...option}
-                                        />
-                                    ))}
                                 </div>
                             )}
                             {enableSignUpWithEmail && !serverError && (
