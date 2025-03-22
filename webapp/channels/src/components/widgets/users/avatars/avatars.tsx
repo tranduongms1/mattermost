@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import classNames from 'classnames';
 import React, {memo, useMemo, useEffect} from 'react';
 import type {ComponentProps, CSSProperties} from 'react';
 import {useIntl} from 'react-intl';
@@ -28,6 +29,7 @@ type Props = {
     totalUsers?: number;
     size?: ComponentProps<typeof Avatar>['size'];
     fetchMissingUsers?: boolean;
+    stacked?: boolean;
 };
 
 const OTHERS_DISPLAY_LIMIT = 99;
@@ -87,6 +89,7 @@ function Avatars({
     userIds,
     totalUsers,
     fetchMissingUsers = true,
+    stacked,
 }: Props) {
     const {formatMessage} = useIntl();
     const dispatch = useDispatch();
@@ -132,7 +135,7 @@ function Avatars({
 
     return (
         <div
-            className={`Avatars Avatars___${size}`}
+            className={classNames([`Avatars Avatars___${size}`, {'stacked': stacked}])}
         >
             {displayUserIds.map((id) => (
                 <UserAvatar

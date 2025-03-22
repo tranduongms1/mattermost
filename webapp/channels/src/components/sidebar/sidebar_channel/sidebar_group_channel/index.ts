@@ -11,7 +11,7 @@ import type {GlobalState} from '@mattermost/types/store';
 import {savePreferences} from 'mattermost-redux/actions/preferences';
 import {getCurrentChannelId, getRedirectChannelNameForTeam, makeGetGmChannelMemberCount} from 'mattermost-redux/selectors/entities/channels';
 import {getCurrentTeam} from 'mattermost-redux/selectors/entities/teams';
-import {getCurrentUserId} from 'mattermost-redux/selectors/entities/users';
+import {getCurrentUserId, getUserIdsInChannels} from 'mattermost-redux/selectors/entities/users';
 
 import SidebarGroupChannel from './sidebar_group_channel';
 
@@ -28,6 +28,7 @@ function makeMapStateToProps() {
         const redirectChannel = currentTeam ? getRedirectChannelNameForTeam(state, currentTeam.id) : '';
         const currentChannelId = getCurrentChannelId(state);
         const membersCount = getMemberCount(state, ownProps.channel);
+        const memberIds = Array.from(getUserIdsInChannels(state)[ownProps.channel.id]?.add(currentUserId) || []);
         const active = ownProps.channel.id === currentChannelId;
 
         return {
@@ -35,6 +36,7 @@ function makeMapStateToProps() {
             redirectChannel,
             active,
             membersCount,
+            memberIds,
         };
     };
 }

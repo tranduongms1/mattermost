@@ -11,6 +11,7 @@ import type {ActionResult} from 'mattermost-redux/types/actions';
 import {trackEvent} from 'actions/telemetry_actions';
 
 import SidebarChannelLink from 'components/sidebar/sidebar_channel/sidebar_channel_link';
+import Avatars from 'components/widgets/users/avatars';
 
 import {getHistory} from 'utils/browser_history';
 import Constants from 'utils/constants';
@@ -22,6 +23,7 @@ type Props = {
     redirectChannel: string;
     active: boolean;
     membersCount: number;
+    memberIds: string[];
     actions: {
         savePreferences: (userId: string, preferences: PreferenceType[]) => Promise<ActionResult>;
     };
@@ -35,6 +37,7 @@ const SidebarGroupChannel = ({
     currentTeamName,
     redirectChannel,
     membersCount,
+    memberIds,
 }: Props) => {
     const handleLeaveChannel = useCallback((callback: () => void) => {
         const id = channel.id;
@@ -51,7 +54,14 @@ const SidebarGroupChannel = ({
 
     const getIcon = () => {
         return (
-            <div className='status status--group'>{membersCount}</div>
+            <div className='GroupChannel__profile-picture'>
+                <Avatars
+                    stacked
+                    size='lg'
+                    userIds={memberIds}
+                    totalUsers={membersCount}
+                />
+            </div>
         );
     };
 
