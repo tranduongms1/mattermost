@@ -30,6 +30,18 @@
     &.Avatars___lg {
         --offset: -7px;
         --border-width: 2px;
+
+        &.stacked {
+            width: 36px;
+            height: 36px;
+
+            .Avatar {
+                width: 21px;
+                min-width: 21px;
+                height: 21px;
+                min-height: 21px;
+            }
+        }
     }
 
     &.Avatars___xl {
@@ -40,6 +52,21 @@
     &.Avatars___xxl {
         --offset: -26px;
         --border-width: 5px;
+    }
+
+    &.stacked {
+        flex-flow: wrap-reverse;
+        --border-width: 1px;
+
+        > button:nth-child(3) {
+            margin-left: 0;
+        }
+
+        > button:nth-child(3),
+        > button:nth-child(4),
+        > div:nth-child(4) {
+            margin-bottom: var(--offset);
+        }
     }
 
     > button {
