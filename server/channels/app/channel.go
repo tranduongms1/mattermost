@@ -537,8 +537,8 @@ func (a *App) createGroupChannel(c request.CTX, userIDs []string) (*model.Channe
 	}
 
 	group := &model.Channel{
-		Name:        model.GetGroupNameFromUserIds(userIDs),
-		DisplayName: model.GetGroupDisplayNameFromUsers(users, true),
+		Name:        model.GetGroupNameFromUserIds(append(userIDs, model.NewId())),
+		DisplayName: "",
 		Type:        model.ChannelTypeGroup,
 	}
 

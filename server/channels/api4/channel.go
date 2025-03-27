@@ -354,7 +354,12 @@ func patchChannel(c *Context, w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-	case model.ChannelTypeGroup, model.ChannelTypeDirect:
+	case model.ChannelTypeGroup:
+		if !c.App.SessionHasPermissionToChannel(c.AppContext, *c.AppContext.Session(), c.Params.ChannelId, model.PermissionManagePrivateChannelProperties) {
+			c.SetPermissionError(model.PermissionManagePrivateChannelProperties)
+			return
+		}
+	case model.ChannelTypeDirect:
 		// Modifying the header is not linked to any specific permission for group/dm channels, so just check for membership.
 		if _, appErr = c.App.GetChannelMember(c.AppContext, c.Params.ChannelId, c.AppContext.Session().UserId); appErr != nil {
 			c.Err = model.NewAppError("patchChannel", "api.channel.patch_update_channel.forbidden.app_error", nil, "", http.StatusForbidden)

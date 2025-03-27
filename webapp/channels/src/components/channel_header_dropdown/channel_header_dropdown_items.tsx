@@ -73,7 +73,7 @@ export default class ChannelHeaderDropdown extends React.PureComponent<Props> {
             return null;
         }
 
-        const isPrivate = channel.type === Constants.PRIVATE_CHANNEL;
+        const isPrivate = channel.type === Constants.PRIVATE_CHANNEL || channel.type === Constants.GM_CHANNEL;
         const isGroupConstrained = channel.group_constrained === true;
         const channelMembersPermission = isPrivate ? Permissions.MANAGE_PRIVATE_CHANNEL_MEMBERS : Permissions.MANAGE_PUBLIC_CHANNEL_MEMBERS;
         const channelPropertiesPermission = isPrivate ? Permissions.MANAGE_PRIVATE_CHANNEL_PROPERTIES : Permissions.MANAGE_PUBLIC_CHANNEL_PROPERTIES;
@@ -261,11 +261,14 @@ export default class ChannelHeaderDropdown extends React.PureComponent<Props> {
                         />
                         <Menu.ItemToggleModalRedux
                             id='channelRename'
-                            show={!isArchived && channel.type !== Constants.DM_CHANNEL && channel.type !== Constants.GM_CHANNEL}
+                            show={!isArchived && channel.type !== Constants.DM_CHANNEL}
                             modalId={ModalIdentifiers.RENAME_CHANNEL}
                             dialogType={RenameChannelModal}
                             dialogProps={{channel}}
-                            text={localizeMessage({id: 'channel_header.rename', defaultMessage: 'Rename Channel'})}
+                            text={channel.type === Constants.GM_CHANNEL 
+                                ? localizeMessage({id: 'channel_header.rename_group', defaultMessage: 'Rename Group'})
+                                : localizeMessage({id: 'channel_header.rename', defaultMessage: 'Rename Channel'})
+                            }
                         />
                     </ChannelPermissionGate>
                     <ChannelPermissionGate
