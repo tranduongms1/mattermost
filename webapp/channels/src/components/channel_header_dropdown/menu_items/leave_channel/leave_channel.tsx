@@ -10,6 +10,7 @@ import LeaveChannelModal from 'components/leave_channel_modal';
 import Menu from 'components/widgets/menu/menu';
 
 import {Constants, ModalIdentifiers} from 'utils/constants';
+import {isOfficialChannel} from 'utils/channel_utils';
 
 import type {PropsFromRedux} from './index';
 
@@ -67,7 +68,7 @@ const LeaveChannel = ({
     return (
         <Menu.ItemAction
             id={id}
-            show={(!isDefault || isGuestUser) && channel.type !== Constants.DM_CHANNEL && channel.type !== Constants.GM_CHANNEL}
+            show={(!isDefault || isGuestUser) && channel.type !== Constants.DM_CHANNEL && (channel.type !== Constants.GM_CHANNEL || !isOfficialChannel(channel))}
             onClick={handleLeave}
             text={intl.formatMessage({id: 'channel_header.leave', defaultMessage: 'Leave Channel'})}
             isDangerous={true}

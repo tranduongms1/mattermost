@@ -65,6 +65,13 @@ export function isArchivedChannel(channel?: Channel) {
     return Boolean(channel && channel.delete_at !== 0);
 }
 
+export function isOfficialChannel(channel: Channel) {
+    if (channel.type === Constants.GM_CHANNEL) {
+        return channel.name.endsWith("ky-thuat");
+    }
+    return false;
+}
+
 type JoinPrivateChannelPromptResult = {
     data: {
         join: boolean;

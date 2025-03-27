@@ -16,6 +16,7 @@ import type {RelationOneToOne} from '@mattermost/types/utilities';
 
 import {Client4} from 'mattermost-redux/client';
 import type {ActionResult} from 'mattermost-redux/types/actions';
+import {isGroupChannel} from 'mattermost-redux/utils/channel_utils';
 import {filterGroupsMatchingTerm} from 'mattermost-redux/utils/group_utils';
 import {displayUsername, filterProfilesStartingWithTerm, isGuest} from 'mattermost-redux/utils/user_utils';
 
@@ -131,7 +132,7 @@ export class ChannelInviteModal extends React.PureComponent<Props, State> {
     private addValue = (value: UserProfileValue | GroupValue): void => {
         if (this.isUser(value)) {
             const profile = value;
-            if (!this.props.membersInTeam || !this.props.membersInTeam[profile.id]) {
+            if (!isGroupChannel(this.props.channel) && (!this.props.membersInTeam || !this.props.membersInTeam[profile.id])) {
                 if (isGuest(profile.roles)) {
                     if (this.state.guestsNotInTeam.indexOf(profile) === -1) {
                         this.setState((prevState) => {
@@ -180,9 +181,12 @@ export class ChannelInviteModal extends React.PureComponent<Props, State> {
     };
 
     public componentDidMount(): void {
-        this.props.actions.getProfilesNotInChannel(this.props.channel.team_id, this.props.channel.id, this.props.channel.group_constrained, 0).then(() => {
-            this.setUsersLoadingState(false);
-        });
+        if (isGroupChannel(this.props.channel)) {
+        } else {
+            this.props.actions.getProfilesNotInChannel(this.props.channel.team_id, this.props.channel.id, this.props.channel.group_constrained, 0).then(() => {
+                this.setUsersLoadingState(false);
+            });
+        }
         this.props.actions.getProfilesInChannel(this.props.channel.id, 0, USERS_PER_PAGE, '', {active: true});
         this.props.actions.getTeamStats(this.props.channel.team_id);
         this.props.actions.loadStatusesForProfilesList(this.props.profilesNotInCurrentChannel);
@@ -275,11 +279,15 @@ export class ChannelInviteModal extends React.PureComponent<Props, State> {
     private handlePageChange = (page: number, prevPage: number): void => {
         if (page > prevPage) {
             this.setUsersLoadingState(true);
-            this.props.actions.getProfilesNotInChannel(
-                this.props.channel.team_id,
-                this.props.channel.id,
-                this.props.channel.group_constrained,
-                page + 1, USERS_PER_PAGE).then(() => this.setUsersLoadingState(false));
+            if (isGroupChannel(this.props.channel)) {
+
+            } else {
+                this.props.actions.getProfilesNotInChannel(
+                    this.props.channel.team_id,
+                    this.props.channel.id,
+                    this.props.channel.group_constrained,
+                    page + 1, USERS_PER_PAGE).then(() => this.setUsersLoadingState(false));
+            }
 
             this.props.actions.getProfilesInChannel(this.props.channel.id, page + 1, USERS_PER_PAGE, '', {active: true});
         }
@@ -346,7 +354,7 @@ export class ChannelInviteModal extends React.PureComponent<Props, State> {
                     include_member_ids: true,
                 };
                 const promises = [
-                    this.props.actions.searchProfiles(term, options),
+                    this.props.actions.searchProfiles(term, isGroupChannel(this.props.channel) ? {} : options),
                 ];
                 if (this.props.isGroupsEnabled) {
                     promises.push(this.props.actions.searchAssociatedGroupsForReference(term, this.props.channel.team_id, this.props.channel.id, opts));

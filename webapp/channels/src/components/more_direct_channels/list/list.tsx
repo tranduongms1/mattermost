@@ -85,13 +85,6 @@ const List = React.forwardRef((props: Props, ref?: React.Ref<MultiSelect<OptionV
                     defaultMessage={'You\'ve reached the maximum number of people for this conversation. Consider creating a private channel instead.'}
                 />
             );
-        } else {
-            note = (
-                <FormattedMessage
-                    id='more_direct_channels.new_convo_note'
-                    defaultMessage={'This will start a new conversation. If you\'re adding a lot of people, consider creating a private channel instead.'}
-                />
-            );
         }
     }
 

@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import type {Dispatch} from 'redux';
 
+import {Channel} from '@mattermost/types/channels';
 import type {UserProfile} from '@mattermost/types/users';
 
 import {getTeamStats, getTeamMembersByIds} from 'mattermost-redux/actions/teams';
@@ -16,18 +17,20 @@ import {makeGetAllAssociatedGroupsForReference} from 'mattermost-redux/selectors
 import {getTeammateNameDisplaySetting, isCustomGroupsEnabled} from 'mattermost-redux/selectors/entities/preferences';
 import {haveICurrentTeamPermission} from 'mattermost-redux/selectors/entities/roles';
 import {getCurrentTeam, getMembersInCurrentTeam, getMembersInTeam, getTeam} from 'mattermost-redux/selectors/entities/teams';
-import {getProfilesNotInCurrentChannel, getProfilesInCurrentChannel, getProfilesNotInCurrentTeam, getProfilesNotInTeam, getUserStatuses, makeGetProfilesNotInChannel, makeGetProfilesInChannel} from 'mattermost-redux/selectors/entities/users';
+import {getProfiles, getProfilesNotInCurrentChannel, getProfilesInCurrentChannel, getProfilesNotInCurrentTeam, getProfilesNotInTeam, getUserStatuses, makeGetProfilesNotInChannel, makeGetProfilesInChannel, getProfilesInCurrentTeam} from 'mattermost-redux/selectors/entities/users';
 
 import {addUsersToChannel} from 'actions/channel_actions';
 import {loadStatusesForProfilesList} from 'actions/status_actions';
 import {searchAssociatedGroupsForReference} from 'actions/views/group';
 import {closeModal} from 'actions/views/modals';
+import Constants from 'utils/constants';
 
 import type {GlobalState} from 'types/store';
 
 import ChannelInviteModal from './channel_invite_modal';
 
 type OwnProps = {
+    channel: Channel;
     channelId?: string;
     teamId?: string;
 }
@@ -55,6 +58,17 @@ function makeMapStateToProps(initialState: GlobalState, initialProps: OwnProps) 
             profilesInCurrentChannel = doGetProfilesInChannel(state, props.channelId);
             profilesNotInCurrentTeam = getProfilesNotInTeam(state, props.teamId);
             membersInTeam = getMembersInTeam(state, props.teamId);
+        } else if (props.channel.type === Constants.GM_CHANNEL) {
+            const filters = {exclude_bots:true, exclude_remote: true};
+            const restrictDirectMessage = getConfig(state).RestrictDirectMessage;
+            if (restrictDirectMessage === 'any') {
+                profilesNotInCurrentChannel = getProfiles(state, filters);
+            } else {
+                profilesNotInCurrentChannel = getProfilesInCurrentTeam(state, filters);
+            }
+            profilesInCurrentChannel = getProfilesInCurrentChannel(state);
+            profilesNotInCurrentTeam = [];
+            membersInTeam = {};
         } else {
             profilesNotInCurrentChannel = getProfilesNotInCurrentChannel(state);
             profilesInCurrentChannel = getProfilesInCurrentChannel(state);

@@ -502,6 +502,10 @@ func (a *App) CreateGroupChannel(c request.CTX, userIDs []string, creatorId stri
 		return nil, err
 	}
 
+	if _, err := a.UpdateChannelMemberSchemeRoles(c, channel.Id, creatorId, false, true, true); err != nil {
+		return nil, err
+	}
+
 	jsonIDs := model.ArrayToJSON(userIDs)
 	for _, userID := range userIDs {
 		a.Srv().Platform().InvalidateChannelCacheForUser(userID)
@@ -1530,7 +1534,7 @@ func (a *App) DeleteChannel(c request.CTX, channel *model.Channel, userID string
 }
 
 func (a *App) addUserToChannel(c request.CTX, user *model.User, channel *model.Channel) (*model.ChannelMember, *model.AppError) {
-	if channel.Type != model.ChannelTypeOpen && channel.Type != model.ChannelTypePrivate {
+	if channel.Type == model.ChannelTypeDirect {
 		return nil, model.NewAppError("AddUserToChannel", "api.channel.add_user_to_channel.type.app_error", nil, "", http.StatusBadRequest)
 	}
 
@@ -1596,7 +1600,7 @@ func (a *App) addUserToChannel(c request.CTX, user *model.User, channel *model.C
 
 // AddUserToChannel adds a user to a given channel.
 func (a *App) AddUserToChannel(c request.CTX, user *model.User, channel *model.Channel, skipTeamMemberIntegrityCheck bool) (*model.ChannelMember, *model.AppError) {
-	if !skipTeamMemberIntegrityCheck {
+	if !channel.IsGroupOrDirect() && !skipTeamMemberIntegrityCheck {
 		teamMember, nErr := a.Srv().Store().Team().GetMember(c, channel.TeamId, user.Id)
 		if nErr != nil {
 			var nfErr *store.ErrNotFound

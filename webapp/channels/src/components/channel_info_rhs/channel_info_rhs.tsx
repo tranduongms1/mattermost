@@ -10,9 +10,8 @@ import type {UserProfile} from '@mattermost/types/users';
 
 import ChannelInviteModal from 'components/channel_invite_modal';
 import ChannelNotificationsModal from 'components/channel_notifications_modal';
-import MoreDirectChannels from 'components/more_direct_channels';
 
-import Constants, {ModalIdentifiers} from 'utils/constants';
+import {ModalIdentifiers} from 'utils/constants';
 import {getSiteURL} from 'utils/url';
 
 import type {ModalData} from 'types/actions';
@@ -102,14 +101,6 @@ const ChannelInfoRhs = ({
     };
 
     const addPeople = () => {
-        if (channel.type === Constants.GM_CHANNEL) {
-            return actions.openModal({
-                modalId: ModalIdentifiers.CREATE_DM_CHANNEL,
-                dialogType: MoreDirectChannels,
-                dialogProps: {isExistingChannel: true},
-            });
-        }
-
         return actions.openModal({
             modalId: ModalIdentifiers.CHANNEL_INVITE,
             dialogType: ChannelInviteModal,
