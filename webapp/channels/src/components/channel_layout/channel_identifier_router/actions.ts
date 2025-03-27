@@ -118,7 +118,7 @@ export async function getPathFromIdentifier(state: GlobalState, path: string, id
         } else if (identifier.length === LENGTH_OF_GROUP_ID) {
             return 'group_channel_group_id';
         }
-        return 'error';
+        return 'group_channel_group_id';
     }
 
     return 'error';

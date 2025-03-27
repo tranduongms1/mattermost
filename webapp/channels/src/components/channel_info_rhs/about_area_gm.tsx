@@ -22,10 +22,11 @@ const Usernames = styled.p`
     text-align: center;
 `;
 
-const ProfilePictures = styled.div`
+const ProfilePictures = styled.div<{size: number}>`
     display: flex;
     justify-content: center;
     margin-bottom: 8px;
+    margin-right: ${(props) => (props.size - 1) * -15}px;
 `;
 
 interface ProfilePictureContainerProps {
@@ -57,7 +58,7 @@ interface Props {
 const AboutAreaGM = ({channel, gmUsers}: Props) => {
     return (
         <UsersArea>
-            <ProfilePictures>
+            <ProfilePictures size={gmUsers.length}>
                 {gmUsers.map((user, idx) => (
                     <ProfilePictureContainer
                         key={user.id}
@@ -74,7 +75,7 @@ const AboutAreaGM = ({channel, gmUsers}: Props) => {
                 ))}
             </ProfilePictures>
             <Usernames>
-                {gmUsers.map((user, i, {length}) => (
+                {channel.display_name || gmUsers.map((user, i, {length}) => (
                     <React.Fragment key={user.id}>
                         <UserProfileElement
                             userId={user.id}

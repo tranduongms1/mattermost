@@ -302,6 +302,7 @@ export class RenameChannelModal extends React.PureComponent<Props, State> {
                             />
                             {displayNameError}
                         </div>
+                        {this.props.channel.type !== Constants.GM_CHANNEL &&
                         <div className='form-group'>
                             <label className='control-label'>{urlInputLabel}</label>
 
@@ -321,12 +322,16 @@ export class RenameChannelModal extends React.PureComponent<Props, State> {
                                     value={this.state.channelName}
                                     maxLength={Constants.MAX_CHANNELNAME_LENGTH}
                                     readOnly={readOnlyHandleInput}
-                                    aria-label={formatMessage({id: 'rename_channel.title', defaultMessage: 'Rename Channel'}).toLowerCase()}
+                                    aria-label={this.props.channel.type === Constants.GM_CHANNEL
+                                        ? formatMessage({id: 'rename_group.title', defaultMessage: 'Rename Group'}).toLowerCase()
+                                        : formatMessage({id: 'rename_channel.title', defaultMessage: 'Rename Channel'}).toLowerCase()
+                                    }
                                 />
                             </div>
                             {urlHelpText}
                             {urlErrors}
                         </div>
+                        }
                         {serverError}
                     </Modal.Body>
                     <Modal.Footer>

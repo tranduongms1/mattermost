@@ -73,6 +73,9 @@ export function completeDirectChannelDisplayName(currentUserId: string, profiles
 
         return Object.assign(dmChannelClone, {display_name: displayUsername(profiles[teammateId], teammateNameDisplay)});
     } else if (isGroupChannel(channel) && userIdsInChannel && userIdsInChannel.size > 0) {
+        if (channel.display_name) {
+            return channel;
+        }
         const displayName = getGroupDisplayNameFromUserIds(userIdsInChannel, profiles, currentUserId, teammateNameDisplay);
         return {...channel, display_name: displayName};
     }
@@ -156,6 +159,9 @@ export function isDefault(channel?: Channel): boolean {
 }
 
 export function completeDirectGroupInfo(usersState: UsersState, teammateNameDisplay: string, channel: Channel, omitCurrentUser = true) {
+    if (channel.display_name) {
+        return channel;
+    }
     const {currentUserId, profiles, profilesInChannel} = usersState;
     const profilesIds = profilesInChannel[channel.id];
     const gm = {...channel};
@@ -188,6 +194,9 @@ export function completeDirectGroupInfo(usersState: UsersState, teammateNameDisp
 //
 // See also newCompleteDirectChannelInfo.
 function newCompleteDirectGroupInfo(currentUserId: string, profiles: IDMappedObjects<UserProfile>, profilesInChannel: RelationOneToManyUnique<Channel, UserProfile>, teammateNameDisplay: string, channel: Channel) {
+    if (channel.display_name) {
+        return channel;
+    }
     const profilesIds = profilesInChannel[channel.id];
     const gm = {...channel};
 
