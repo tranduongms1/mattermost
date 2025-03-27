@@ -19,7 +19,6 @@ import ConvertGmToChannelModal from 'components/convert_gm_to_channel_modal';
 import DeleteChannelModal from 'components/delete_channel_modal';
 import EditChannelHeaderModal from 'components/edit_channel_header_modal';
 import EditChannelPurposeModal from 'components/edit_channel_purpose_modal';
-import MoreDirectChannels from 'components/more_direct_channels';
 import ChannelPermissionGate from 'components/permissions_gates/channel_permission_gate';
 import RenameChannelModal from 'components/rename_channel_modal';
 import UnarchiveChannelModal from 'components/unarchive_channel_modal';
@@ -153,18 +152,10 @@ export default class ChannelHeaderDropdown extends React.PureComponent<Props> {
                     >
                         <Menu.ItemToggleModalRedux
                             id='channelAddMembers'
-                            show={channel.type !== Constants.DM_CHANNEL && channel.type !== Constants.GM_CHANNEL && !isArchived && !isDefault && !isGroupConstrained}
+                            show={channel.type !== Constants.DM_CHANNEL && !isArchived && !isDefault && !isGroupConstrained}
                             modalId={ModalIdentifiers.CHANNEL_INVITE}
                             dialogType={ChannelInviteModal}
                             dialogProps={{channel}}
-                            text={localizeMessage({id: 'navbar.addMembers', defaultMessage: 'Add Members'})}
-                        />
-                        <Menu.ItemToggleModalRedux
-                            id='channelAddMembers'
-                            show={channel.type === Constants.GM_CHANNEL && !isArchived && !isGroupConstrained}
-                            modalId={ModalIdentifiers.CREATE_DM_CHANNEL}
-                            dialogType={MoreDirectChannels}
-                            dialogProps={{isExistingChannel: true}}
                             text={localizeMessage({id: 'navbar.addMembers', defaultMessage: 'Add Members'})}
                         />
                     </ChannelPermissionGate>
@@ -197,7 +188,7 @@ export default class ChannelHeaderDropdown extends React.PureComponent<Props> {
                         <MenuItemOpenMembersRHS
                             id='channelManageMembers'
                             channel={channel}
-                            show={channel.type !== Constants.DM_CHANNEL && channel.type !== Constants.GM_CHANNEL && !isArchived && !isDefault}
+                            show={channel.type !== Constants.DM_CHANNEL && !isArchived && !isDefault}
                             text={localizeMessage({id: 'channel_header.manageMembers', defaultMessage: 'Manage Members'})}
                             editMembers={!isArchived}
                         />

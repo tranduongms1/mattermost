@@ -1812,7 +1812,7 @@ func addChannelMember(c *Context, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if channel.Type == model.ChannelTypeDirect || channel.Type == model.ChannelTypeGroup {
+	if channel.Type == model.ChannelTypeDirect {
 		c.Err = model.NewAppError("addUserToChannel", "api.channel.add_user_to_channel.type.app_error", nil, "", http.StatusBadRequest)
 		return
 	}
@@ -1969,7 +1969,7 @@ func removeChannelMember(c *Context, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !(channel.Type == model.ChannelTypeOpen || channel.Type == model.ChannelTypePrivate) {
+	if channel.Type == model.ChannelTypeDirect {
 		c.Err = model.NewAppError("removeChannelMember", "api.channel.remove_channel_member.type.app_error", nil, "", http.StatusBadRequest)
 		return
 	}
