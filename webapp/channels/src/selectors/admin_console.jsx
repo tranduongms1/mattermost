@@ -64,9 +64,7 @@ export const getShowManageUserSettings = createSelector(
     (license, state) => {
         const hasWriteUserManagementPermission = haveISystemPermission(state, {permission: Permissions.SYSCONSOLE_WRITE_USERMANAGEMENT_USERS});
 
-        const isEnterprise = isEnterpriseOrE20License(license);
-
-        return hasWriteUserManagementPermission && isEnterprise;
+        return hasWriteUserManagementPermission;
     },
 );
 
@@ -75,10 +73,6 @@ export const getShowLockedManageUserSettings = createSelector(
     getLicense,
     (state) => state,
     (license, state) => {
-        const hasWriteUserManagementPermission = haveISystemPermission(state, {permission: Permissions.SYSCONSOLE_WRITE_USERMANAGEMENT_USERS});
-
-        const isEnterprise = isEnterpriseOrE20License(license);
-
-        return hasWriteUserManagementPermission && !isEnterprise;
+        return false;
     },
 );

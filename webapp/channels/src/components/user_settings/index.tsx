@@ -42,6 +42,7 @@ export default function UserSettings(props: Props) {
                     updateTab={props.updateTab}
                     closeModal={props.closeModal}
                     collapseModal={props.collapseModal}
+                    adminMode={props.adminMode}
                 />
             </div>
         );

@@ -110,10 +110,12 @@ export type Props = {
         logError: ({message, type}: {message: any; type: string}, status: boolean) => void;
         clearErrors: () => void;
         updateMe: (user: UserProfile) => Promise<ActionResult>;
+        patchUser: (user: UserProfile) => Promise<ActionResult>;
         sendVerificationEmail: (email: string) => Promise<ActionResult>;
         setDefaultProfileImage: (id: string) => void;
         uploadProfileImage: (id: string, file: File) => Promise<ActionResult>;
     };
+    adminMode?: boolean;
     requireEmailVerification?: boolean;
     ldapFirstNameAttributeSet?: boolean;
     ldapLastNameAttributeSet?: boolean;
@@ -294,7 +296,8 @@ export class UserSettingsGeneralTab extends PureComponent<Props, State> {
         const {formatMessage} = this.props.intl;
         this.setState({sectionIsSaving: true});
 
-        this.props.actions.updateMe(user).
+        const action = this.props.adminMode ? this.props.actions.patchUser : this.props.actions.updateMe;
+        action(user).
             then(({data, error: err}) => {
                 if (data) {
                     this.updateSection('');
@@ -464,6 +467,7 @@ export class UserSettingsGeneralTab extends PureComponent<Props, State> {
     }
 
     createEmailSection() {
+        if (this.props.adminMode) return null;
         const {formatMessage} = this.props.intl;
 
         const active = this.props.activeSection === 'email';
@@ -1262,6 +1266,7 @@ export class UserSettingsGeneralTab extends PureComponent<Props, State> {
     };
 
     createPictureSection = () => {
+        if (this.props.adminMode) return null;
         const user = this.props.user;
         const {formatMessage} = this.props.intl;
 

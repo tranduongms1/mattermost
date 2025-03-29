@@ -11,6 +11,7 @@ import {
     sendVerificationEmail,
     setDefaultProfileImage,
     uploadProfileImage,
+    patchUser,
 } from 'mattermost-redux/actions/users';
 import {getConfig} from 'mattermost-redux/selectors/entities/general';
 
@@ -57,6 +58,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
             logError,
             clearErrors,
             updateMe,
+            patchUser,
             sendVerificationEmail,
             setDefaultProfileImage,
             uploadProfileImage,
