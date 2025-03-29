@@ -943,6 +943,7 @@ export class UserSettingsGeneralTab extends PureComponent<Props, State> {
                 title={formatMessage(holders.fullName)}
                 describe={describe}
                 section={'name'}
+                isDisabled={!this.props.adminMode}
                 updateSection={this.updateSection}
                 max={max}
             />
@@ -1048,6 +1049,8 @@ export class UserSettingsGeneralTab extends PureComponent<Props, State> {
             }
         }
 
+        if (!this.props.adminMode && !user.nickname) return null;
+
         return (
             <SettingItem
                 active={active}
@@ -1055,6 +1058,7 @@ export class UserSettingsGeneralTab extends PureComponent<Props, State> {
                 title={formatMessage(holders.nickname)}
                 describe={describe}
                 section={'nickname'}
+                isDisabled={!this.props.adminMode}
                 updateSection={this.updateSection}
                 max={max}
             />
@@ -1146,6 +1150,7 @@ export class UserSettingsGeneralTab extends PureComponent<Props, State> {
                 title={formatMessage(holders.username)}
                 describe={this.props.user.username}
                 section={'username'}
+                isDisabled={!this.props.adminMode}
                 updateSection={this.updateSection}
                 max={max}
             />
@@ -1252,6 +1257,8 @@ export class UserSettingsGeneralTab extends PureComponent<Props, State> {
             }
         }
 
+        if (!this.props.adminMode && !user.position) return null;
+
         return (
             <SettingItem
                 active={active}
@@ -1259,6 +1266,7 @@ export class UserSettingsGeneralTab extends PureComponent<Props, State> {
                 title={formatMessage(holders.position)}
                 describe={describe}
                 section={'position'}
+                isDisabled={!this.props.adminMode}
                 updateSection={this.updateSection}
                 max={max}
             />
