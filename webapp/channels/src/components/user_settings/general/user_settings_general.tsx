@@ -839,7 +839,7 @@ export class UserSettingsGeneralTab extends PureComponent<Props, State> {
                     </div>,
                 );
 
-                inputs.push(
+                inputs.unshift(
                     <div
                         key='lastNameSetting'
                         className='form-group'
@@ -914,7 +914,7 @@ export class UserSettingsGeneralTab extends PureComponent<Props, State> {
         let describe: JSX.Element|string = '';
 
         if (user.first_name && user.last_name) {
-            describe = user.first_name + ' ' + user.last_name;
+            describe = user.last_name + ' ' + user.first_name;
         } else if (user.first_name) {
             describe = user.first_name;
         } else if (user.last_name) {
