@@ -9,8 +9,6 @@ import type {Role} from '@mattermost/types/roles';
 
 import Permissions from 'mattermost-redux/constants/permissions';
 
-import {isEnterpriseLicense, isNonEnterpriseLicense} from 'utils/license_utils';
-
 import type {AdditionalValues, Group} from './types';
 
 import EditPostTimeLimitButton from '../edit_post_time_limit_button';
@@ -118,41 +116,6 @@ export default class PermissionsTree extends React.PureComponent<Props, State> {
                 ],
             },
             {
-                id: 'playbook_public',
-                permissions: [
-                    Permissions.PLAYBOOK_PUBLIC_CREATE,
-                    Permissions.PLAYBOOK_PUBLIC_MANAGE_PROPERTIES,
-                    Permissions.PLAYBOOK_PUBLIC_MANAGE_MEMBERS,
-                ],
-                isVisible: isNonEnterpriseLicense,
-            },
-            {
-                id: 'playbook_public',
-                permissions: [
-                    Permissions.PLAYBOOK_PUBLIC_CREATE,
-                    Permissions.PLAYBOOK_PUBLIC_MANAGE_PROPERTIES,
-                    Permissions.PLAYBOOK_PUBLIC_MANAGE_MEMBERS,
-                    Permissions.PLAYBOOK_PUBLIC_MAKE_PRIVATE,
-                ],
-                isVisible: isEnterpriseLicense,
-            },
-            {
-                id: 'playbook_private',
-                permissions: [
-                    Permissions.PLAYBOOK_PRIVATE_CREATE,
-                    Permissions.PLAYBOOK_PRIVATE_MANAGE_PROPERTIES,
-                    Permissions.PLAYBOOK_PRIVATE_MANAGE_MEMBERS,
-                    Permissions.PLAYBOOK_PRIVATE_MAKE_PUBLIC,
-                ],
-                isVisible: isEnterpriseLicense,
-            },
-            {
-                id: 'runs',
-                permissions: [
-                    Permissions.RUN_CREATE,
-                ],
-            },
-            {
                 id: 'posts',
                 permissions: [
                     {
@@ -190,16 +153,6 @@ export default class PermissionsTree extends React.PureComponent<Props, State> {
                 permissions: [
                 ],
             },
-            {
-                id: 'custom_groups',
-                permissions: [
-                    Permissions.CREATE_CUSTOM_GROUP,
-                    Permissions.MANAGE_CUSTOM_GROUP_MEMBERS,
-                    Permissions.EDIT_CUSTOM_GROUP,
-                    Permissions.DELETE_CUSTOM_GROUP,
-                    Permissions.RESTORE_CUSTOM_GROUP,
-                ],
-            },
         ];
         this.updateGroups();
     }
@@ -210,10 +163,9 @@ export default class PermissionsTree extends React.PureComponent<Props, State> {
         const teamsGroup = this.groups[0];
         const publicChannelsGroup = this.groups[1];
         const privateChannelsGroup = this.groups[2];
-        const postsGroup = this.groups[7];
-        const integrationsGroup = this.groups[8];
-        const sharedChannelsGroup = this.groups[9];
-        const customGroupsGroup = this.groups[10];
+        const postsGroup = this.groups[3];
+        const integrationsGroup = this.groups[4];
+        const sharedChannelsGroup = this.groups[5];
 
         if (config.EnableIncomingWebhooks === 'true' && !integrationsGroup.permissions.includes(Permissions.MANAGE_INCOMING_WEBHOOKS)) {
             integrationsGroup.permissions.push(Permissions.MANAGE_INCOMING_WEBHOOKS);
@@ -260,9 +212,6 @@ export default class PermissionsTree extends React.PureComponent<Props, State> {
         if (config.ExperimentalSharedChannels === 'true') {
             sharedChannelsGroup.permissions.push(Permissions.MANAGE_SHARED_CHANNELS);
             sharedChannelsGroup.permissions.push(Permissions.MANAGE_SECURE_CONNECTIONS);
-        }
-        if (!this.props.customGroupsEnabled) {
-            customGroupsGroup?.permissions.pop();
         }
 
         if (license?.IsLicensed === 'true') {
