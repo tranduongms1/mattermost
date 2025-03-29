@@ -4,24 +4,19 @@
 import classNames from 'classnames';
 import React from 'react';
 import type {MouseEvent, ReactNode, RefObject} from 'react';
-import {Overlay} from 'react-bootstrap';
 import {FormattedMessage, injectIntl} from 'react-intl';
 import type {IntlShape} from 'react-intl';
 
 import type {Channel, ChannelMembership, ChannelNotifyProps} from '@mattermost/types/channels';
 import type {UserCustomStatus, UserProfile} from '@mattermost/types/users';
 
-import {Permissions} from 'mattermost-redux/constants';
 import {memoizeResult} from 'mattermost-redux/utils/helpers';
 
 import CustomStatusEmoji from 'components/custom_status/custom_status_emoji';
 import CustomStatusText from 'components/custom_status/custom_status_text';
 import EditChannelHeaderModal from 'components/edit_channel_header_modal';
-import Markdown from 'components/markdown';
 import type {BaseOverlayTrigger} from 'components/overlay_trigger';
-import ChannelPermissionGate from 'components/permissions_gates/channel_permission_gate';
 import Timestamp from 'components/timestamp';
-import Popover from 'components/widgets/popover';
 import WithTooltip from 'components/with_tooltip';
 
 import CallButton from 'plugins/call_button';
@@ -250,13 +245,11 @@ class ChannelHeader extends React.PureComponent<Props, State> {
 
     render() {
         const {
-            teamId,
             currentUser,
             gmMembers,
             channel,
             channelMember,
             isMuted: channelMuted,
-            isReadOnly,
             dmUser,
             rhsState,
             hasGuests,
@@ -283,7 +276,6 @@ class ChannelHeader extends React.PureComponent<Props, State> {
             );
         }
 
-        const channelIsArchived = channel.delete_at !== 0;
         if (isEmptyObject(channel) ||
             isEmptyObject(channelMember) ||
             isEmptyObject(currentUser) ||
@@ -295,11 +287,8 @@ class ChannelHeader extends React.PureComponent<Props, State> {
             );
         }
 
-        const channelNamesMap = channel.props && channel.props.channel_mentions;
-
         const isDirect = (channel.type === Constants.DM_CHANNEL);
         const isGroup = (channel.type === Constants.GM_CHANNEL);
-        const isPrivate = (channel.type === Constants.PRIVATE_CHANNEL);
 
         if (isGroup) {
             if (hasGuests && !hideGuestTags) {
@@ -430,133 +419,15 @@ class ChannelHeader extends React.PureComponent<Props, State> {
             );
         }
 
-        let headerTextContainer;
-        const headerText = (isDirect && dmUser?.is_bot) ? dmUser.bot_description : channel.header;
-        if (headerText) {
-            const imageProps = {
-                hideUtilities: true,
-            };
-            const popoverContent = (
-                <Popover
-                    id='header-popover'
-                    popoverStyle='info'
-                    popoverSize='lg'
-                    style={{transform: `translate(${this.state.leftOffset}px, ${this.state.topOffset}px)`, maxWidth: this.state.channelHeaderPoverWidth + 16}}
-                    placement='bottom'
-                    className={classNames('channel-header__popover', {'chanel-header__popover--lhs_offset': this.props.hasMoreThanOneTeam})}
-                >
-                    <span
-                        onClick={this.handleFormattedTextClick}
-                    >
-                        <Markdown
-                            message={headerText}
-                            options={this.getPopoverMarkdownOptions(channelNamesMap)}
-                            imageProps={imageProps}
-                        />
-                    </span>
-                </Popover>
-            );
-
-            headerTextContainer = (
-                <div
-                    id='channelHeaderDescription'
-                    className='channel-header__description'
-                    dir='auto'
-                >
-                    {dmHeaderTextStatus}
-                    {hasGuestsText}
-                    <div
-                        className='header-popover-text-measurer'
-                        ref={this.headerPopoverTextMeasurerRef}
-                    >
-                        <Markdown
-                            message={headerText.replace(/\n+/g, ' ')}
-                            options={this.getHeaderMarkdownOptions(channelNamesMap)}
-                            imageProps={imageProps}
-                        />
-                    </div>
-                    <span
-                        className='header-description__text'
-                        onClick={this.handleFormattedTextClick}
-                        onMouseOver={() => this.showChannelHeaderPopover(headerText)}
-                        onMouseOut={() => this.setState({showChannelHeaderPopover: false})}
-                        ref={this.headerDescriptionRef}
-                    >
-                        <Overlay
-                            show={this.state.showChannelHeaderPopover}
-                            placement='bottom'
-                            rootClose={true}
-                            target={this.headerDescriptionRef.current as React.ReactInstance}
-                            ref={this.headerOverlayRef as any}
-                            onHide={() => this.setState({showChannelHeaderPopover: false})}
-                        >
-                            {popoverContent}
-                        </Overlay>
-
-                        <Markdown
-                            message={headerText}
-                            options={this.getHeaderMarkdownOptions(channelNamesMap)}
-                            imageProps={imageProps}
-                        />
-                    </span>
-                </div>
-            );
-        } else {
-            let editMessage;
-            if (!isReadOnly && !channelIsArchived) {
-                if (isDirect || isGroup) {
-                    if (!isDirect || !dmUser?.is_bot) {
-                        editMessage = (
-                            <button
-                                className='header-placeholder style--none'
-                                onClick={this.showEditChannelHeaderModal}
-                            >
-                                <FormattedMessage
-                                    id='channel_header.addChannelHeader'
-                                    defaultMessage='Add a channel header'
-                                />
-                                <i
-                                    className='icon icon-pencil-outline edit-icon'
-                                    aria-label={this.props.intl.formatMessage({id: 'channel_header.editLink', defaultMessage: 'Edit'})}
-                                />
-                            </button>
-                        );
-                    }
-                } else {
-                    editMessage = (
-                        <ChannelPermissionGate
-                            channelId={channel.id}
-                            teamId={teamId}
-                            permissions={[isPrivate ? Permissions.MANAGE_PRIVATE_CHANNEL_PROPERTIES : Permissions.MANAGE_PUBLIC_CHANNEL_PROPERTIES]}
-                        >
-                            <button
-                                className='header-placeholder style--none'
-                                onClick={this.showEditChannelHeaderModal}
-                            >
-                                <FormattedMessage
-                                    id='channel_header.addChannelHeader'
-                                    defaultMessage='Add a channel header'
-                                />
-                                <i
-                                    className='icon icon-pencil-outline edit-icon'
-                                    aria-label={this.props.intl.formatMessage({id: 'channel_header.editLink', defaultMessage: 'Edit'})}
-                                />
-                            </button>
-                        </ChannelPermissionGate>
-                    );
-                }
-            }
-            headerTextContainer = (
-                <div
-                    id='channelHeaderDescription'
-                    className='channel-header__description'
-                >
-                    {dmHeaderTextStatus}
-                    {hasGuestsText}
-                    {editMessage}
-                </div>
-            );
-        }
+        let headerTextContainer = (
+            <div
+                id='channelHeaderDescription'
+                className='channel-header__description'
+            >
+                {dmHeaderTextStatus}
+                {hasGuestsText}
+            </div>
+        );
 
         let muteTrigger;
         if (channelMuted) {
