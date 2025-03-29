@@ -107,13 +107,7 @@ const AtMentionSuggestion = React.forwardRef<HTMLDivElement, SuggestionProps<Ite
     } else {
         itemname = item.username;
 
-        if (item.isCurrentUser) {
-            if (item.first_name || item.last_name) {
-                description = <span>{Utils.getFullName(item)}</span>;
-            }
-        } else if (item.first_name || item.last_name || item.nickname) {
-            description = <span>{`${Utils.getFullName(item)} ${item.nickname ? `(${item.nickname})` : ''}`.trim()}</span>;
-        }
+        description = Utils.getDisplayName(item);
 
         icon = (
             <span className='status-wrapper style--none'>
@@ -181,9 +175,11 @@ const AtMentionSuggestion = React.forwardRef<HTMLDivElement, SuggestionProps<Ite
         >
             {icon}
             <span className='suggestion-list__ellipsis'>
+                {itemname != item.username &&
                 <span className='suggestion-list__main'>
                     {'@' + itemname}
                 </span>
+                }
                 {item.is_bot && <BotTag/>}
                 {description}
                 {youElement}
