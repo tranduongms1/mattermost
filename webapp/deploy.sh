@@ -1,0 +1,1 @@
+cp mattermost-webapp.tar.gz /c/mattermost/ && cd /c/mattermost && rm -rf client && tar -xvf mattermost-webapp.tar.gz && rm mattermost-webapp.tar.gz
