@@ -91,7 +91,7 @@ export default function UserProfile({
                 withTooltip={true}
             />
             }
-            {(user && user.is_bot) && <BotTag/>}
+            {(false && user && user.is_bot) && <BotTag/>}
             {(user && isGuest(user.roles)) && <GuestTag/>}
         </>
     );

@@ -35,6 +35,9 @@ function mapStateToProps(state: GlobalState, props: RouteComponentProps) {
     const teamId = team?.id ?? '';
     const productId = selectCurrentProductId(state, props.location.pathname);
 
+    const isChannelTroubles = [RHSStates.CHANNEL_TROUBLES, RHSStates.CHANNEL_DONE_TROUBLES, RHSStates.CHANNEL_COMPLETED_TROUBLES].includes(rhsState as any);
+    const isChannelIssues = [RHSStates.CHANNEL_ISSUES, RHSStates.CHANNEL_DONE_ISSUES, RHSStates.CHANNEL_COMPLETED_ISSUES].includes(rhsState as any);
+
     const selectedPostId = getSelectedPostId(state);
     const selectedPostCardId = getSelectedPostCardId(state);
 
@@ -50,6 +53,11 @@ function mapStateToProps(state: GlobalState, props: RouteComponentProps) {
         isChannelFiles: rhsState === RHSStates.CHANNEL_FILES,
         isChannelInfo: rhsState === RHSStates.CHANNEL_INFO,
         isChannelMembers: rhsState === RHSStates.CHANNEL_MEMBERS,
+        isChannelTroubles,
+        isChannelIssues,
+        isChannelRecurringTasks: rhsState === RHSStates.CHANNEL_RECURRING_TASKS,
+        isChannelPlans: rhsState === RHSStates.CHANNEL_PLANS,
+        isChannelDoneTasks: rhsState === RHSStates.CHANNEL_DONE_TASKS,
         isPluginView: rhsState === RHSStates.PLUGIN,
         isPostEditHistory: rhsState === RHSStates.EDIT_HISTORY,
         rhsChannel: getSelectedChannel(state),

@@ -115,6 +115,11 @@ function selectedChannelId(state = '', action: AnyAction) {
             RHSStates.CHANNEL_FILES,
             RHSStates.CHANNEL_INFO,
             RHSStates.CHANNEL_MEMBERS,
+            RHSStates.CHANNEL_TROUBLES,
+            RHSStates.CHANNEL_ISSUES,
+            RHSStates.CHANNEL_RECURRING_TASKS,
+            RHSStates.CHANNEL_PLANS,
+            RHSStates.CHANNEL_DONE_TASKS,
             RHSStates.EDIT_HISTORY,
         ].includes(action.state)) {
             return action.channelId;

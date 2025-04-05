@@ -13,3 +13,122 @@
 @import 'responsive/module';
 @import 'widgets/module';
 @import 'admin_console_base/module';
+
+.channel-header__icon.outline {
+    padding: 4px 6px;
+    border: 1px solid;
+    border-radius: 8px;
+    margin-right: 8px;
+}
+
+.modal-footer #fileUploadButton {
+    width: 40px;
+    height: 40px;
+    margin-right: 8px;
+}
+
+#sidebar-right {
+    min-width: 416px !important;
+}
+
+.sidebar--right__title {
+    line-height: 2rem !important;
+}
+
+#sidebar-right .post--thread.post--bot {
+    padding: 0 24px;
+
+    .post__content {
+        padding-right: 0;
+    }
+    .post__img {
+        display: none;
+    }
+    .post__img + div {
+        max-width: initial;
+        flex: 1 1 auto;
+    }
+    .post__header .col__name,
+    .post__header .col.d-flex {
+        display: none !important;
+    }
+    .AutoHeight {
+        width: 100% !important;
+    }
+    .attachment-actions .btn {
+        padding: 0 6px 0 2px;
+        gap: 4px;
+    }
+    .file-view--single,
+    .post-image__columns {
+        display: none !important;
+    }
+}
+
+.post-right__scroll {
+    padding-top: 16px !important;
+}
+
+.post-card--info:not(.d-flex) {
+    padding: 8px 15px;
+}
+
+.post-card--info:not(.d-flex) .btn + .btn {
+    margin-left: 0;
+}
+
+.create-task-modal {
+    .modal-body {
+        overflow: visible;
+    }
+
+    .dateTime__calendar-input {
+        width: 100%;
+        border: 2px solid var(--button-bg);
+        font-size: 14px;
+
+        &:hover {
+            border: 2px solid var(--button-bg);
+            cursor: pointer;
+        }
+
+        &:focus-within {
+            box-shadow: 0;
+        }
+
+        .Input_wrapper {
+            padding: 0 10px;
+        }
+
+        button.dateTime__calendar-icon {
+            margin: 0 8px 0 0;
+            color: rgba(var(--center-channel-color-rgb), 0.64);
+        }
+
+        input#customStatus__calendar-input {
+            &.form-control {
+                height: auto;
+                padding: 0;
+                border: 0;
+                font-weight: 400;
+
+                &[readonly] {
+                    background: transparent;
+                }
+
+                &:hover {
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+
+    .dateTime {
+        width: 100%;
+        margin: unset;
+
+        .dateTime__input {
+            width: 100%;
+        }
+    }
+}
