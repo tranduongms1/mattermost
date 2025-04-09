@@ -479,6 +479,142 @@ export function showChannelInfo(channelId: string) {
     };
 }
 
+export function showChannelTroubles(channelId: string): ActionFuncAsync<boolean, GlobalState> {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: ActionTypes.UPDATE_RHS_STATE,
+            channelId,
+            state: RHSStates.CHANNEL_TROUBLES,
+        });
+
+        return {data: true};
+    };
+}
+
+export function showChannelDoneTroubles(channelId: string): ActionFuncAsync<boolean, GlobalState> {
+    return async (dispatch, getState) => {
+        const state = getState();
+
+        let previousRhsState = getRhsState(state);
+        if (previousRhsState === RHSStates.CHANNEL_DONE_TROUBLES) {
+            previousRhsState = getPreviousRhsState(state);
+        }
+        dispatch({
+            type: ActionTypes.UPDATE_RHS_STATE,
+            channelId,
+            state: RHSStates.CHANNEL_DONE_TROUBLES,
+            previousRhsState,
+        });
+
+        return {data: true};
+    };
+}
+
+export function showChannelCompletedTroubles(channelId: string): ActionFuncAsync<boolean, GlobalState> {
+    return async (dispatch, getState) => {
+        const state = getState();
+
+        let previousRhsState = getRhsState(state);
+        if (previousRhsState === RHSStates.CHANNEL_COMPLETED_TROUBLES) {
+            previousRhsState = getPreviousRhsState(state);
+        }
+        dispatch({
+            type: ActionTypes.UPDATE_RHS_STATE,
+            channelId,
+            state: RHSStates.CHANNEL_COMPLETED_TROUBLES,
+            previousRhsState,
+        });
+
+        return {data: true};
+    };
+}
+
+export function showChannelIssues(channelId: string): ActionFuncAsync<boolean, GlobalState> {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: ActionTypes.UPDATE_RHS_STATE,
+            channelId,
+            state: RHSStates.CHANNEL_ISSUES,
+        });
+
+        return {data: true};
+    };
+}
+
+export function showChannelDoneIssues(channelId: string): ActionFuncAsync<boolean, GlobalState> {
+    return async (dispatch, getState) => {
+        const state = getState();
+
+        let previousRhsState = getRhsState(state);
+        if (previousRhsState === RHSStates.CHANNEL_DONE_ISSUES) {
+            previousRhsState = getPreviousRhsState(state);
+        }
+        dispatch({
+            type: ActionTypes.UPDATE_RHS_STATE,
+            channelId,
+            state: RHSStates.CHANNEL_DONE_ISSUES,
+            previousRhsState,
+        });
+
+        return {data: true};
+    };
+}
+
+export function showChannelCompletedIssues(channelId: string): ActionFuncAsync<boolean, GlobalState> {
+    return async (dispatch, getState) => {
+        const state = getState();
+
+        let previousRhsState = getRhsState(state);
+        if (previousRhsState === RHSStates.CHANNEL_COMPLETED_ISSUES) {
+            previousRhsState = getPreviousRhsState(state);
+        }
+        dispatch({
+            type: ActionTypes.UPDATE_RHS_STATE,
+            channelId,
+            state: RHSStates.CHANNEL_COMPLETED_ISSUES,
+            previousRhsState,
+        });
+
+        return {data: true};
+    };
+}
+
+export function showChannelRecurringTasks(channelId: string): ActionFuncAsync<boolean, GlobalState> {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: ActionTypes.UPDATE_RHS_STATE,
+            channelId,
+            state: RHSStates.CHANNEL_RECURRING_TASKS,
+        });
+
+        return {data: true};
+    };
+}
+
+export function showChannelPlans(channelId: string): ActionFuncAsync<boolean, GlobalState> {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: ActionTypes.UPDATE_RHS_STATE,
+            channelId,
+            state: RHSStates.CHANNEL_PLANS,
+        });
+
+        return {data: true};
+    };
+}
+
+export function showChannelDoneTasks(channelId: string): ActionFuncAsync<boolean, GlobalState> {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: ActionTypes.UPDATE_RHS_STATE,
+            channelId,
+            state: RHSStates.CHANNEL_DONE_TASKS,
+        });
+
+        return {data: true};
+    };
+}
+
 export function closeRightHandSide(): ActionFunc {
     return (dispatch) => {
         const actionsBatch: AnyAction[] = [

@@ -13,15 +13,18 @@ import {
     closeRightHandSide,
     toggleRhsExpanded,
 } from 'actions/views/rhs';
-import {getIsRhsExpanded} from 'selectors/rhs';
+import {getIsRhsExpanded, getSelectedPostCard} from 'selectors/rhs';
 
 import type {GlobalState} from 'types/store';
 
 import RhsCardHeader from './rhs_card_header';
 
 function mapStateToProps(state: GlobalState) {
+    const selected = getSelectedPostCard(state);
+
     return {
         isExpanded: getIsRhsExpanded(state),
+        postType: selected.type,
     };
 }
 

@@ -24,12 +24,17 @@ import {HFTRoute, LoggedInHFTRoute} from 'components/header_footer_template_rout
 import InitialLoadingScreen from 'components/initial_loading_screen';
 import LoggedIn from 'components/logged_in';
 import LoggedInRoute from 'components/logged_in_route';
+import IssueCard from 'components/rhs_card/issue_card';
+import IssuePost from 'components/post_view/issue_post';
+import TroubleCard from 'components/rhs_card/trouble_card';
+import TroublePost from 'components/post_view/trouble_post';
 import {LAUNCHING_WORKSPACE_FULLSCREEN_Z_INDEX} from 'components/preparing_workspace/launching_workspace';
 import {Animations} from 'components/preparing_workspace/steps';
 import SidebarMobileRightMenu from 'components/sidebar_mobile_right_menu';
 
 import webSocketClient from 'client/web_websocket_client';
 import {initializePlugins} from 'plugins';
+import PluginRegistry from 'plugins/registry';
 import A11yController from 'utils/a11y_controller';
 import {PageLoadContext} from 'utils/constants';
 import {EmojiIndicesByAlias} from 'utils/emoji';
@@ -182,6 +187,12 @@ export default class Root extends React.PureComponent<Props, State> {
         ]).then(() => {
             this.setState({shouldMountAppRoutes: true});
         });
+
+        const registry = new PluginRegistry('emotion');
+        registry.registerPostTypeComponent('custom_issue', IssuePost);
+        registry.registerPostCardTypeComponent('custom_issue', IssueCard);
+        registry.registerPostTypeComponent('custom_trouble', TroublePost);
+        registry.registerPostCardTypeComponent('custom_trouble', TroubleCard);
 
         this.props.actions.migrateRecentEmojis();
         this.props.actions.loadRecentlyUsedCustomEmojis();

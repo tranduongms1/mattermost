@@ -12,6 +12,11 @@ import {trackEvent} from 'actions/telemetry_actions.jsx';
 
 import ChannelInfoRhs from 'components/channel_info_rhs';
 import ChannelMembersRhs from 'components/channel_members_rhs';
+import ChannelTroublesRhs from 'components/channel_troubles_rhs';
+import ChannelIssuesRhs from 'components/channel_issues_rhs';
+import ChannelRecurringTasksRhs from 'components/channel_recurring_tasks_rhs';
+import ChannelPlansRhs from 'components/channel_plans_rhs';
+import ChannelDoneTasksRhs from 'components/channel_done_tasks_rhs';
 import FileUploadOverlay from 'components/file_upload_overlay';
 import LoadingScreen from 'components/loading_screen';
 import PostEditHistory from 'components/post_edit_history';
@@ -41,6 +46,11 @@ export type Props = {
     isChannelFiles: boolean;
     isChannelInfo: boolean;
     isChannelMembers: boolean;
+    isChannelTroubles: boolean;
+    isChannelIssues: boolean;
+    isChannelRecurringTasks: boolean;
+    isChannelPlans: boolean;
+    isChannelDoneTasks: boolean;
     isPluginView: boolean;
     isPostEditHistory: boolean;
     previousRhsState: RhsState;
@@ -214,6 +224,11 @@ export default class SidebarRight extends React.PureComponent<Props, State> {
             isOpen,
             isChannelInfo,
             isChannelMembers,
+            isChannelTroubles,
+            isChannelIssues,
+            isChannelRecurringTasks,
+            isChannelPlans,
+            isChannelDoneTasks,
             isExpanded,
             isPostEditHistory,
         } = this.props;
@@ -245,6 +260,21 @@ export default class SidebarRight extends React.PureComponent<Props, State> {
         } else if (isChannelMembers) {
             currentChannelNeeded = true;
             content = <ChannelMembersRhs/>;
+        } else if (isChannelTroubles) {
+            currentChannelNeeded = true;
+            content = <ChannelTroublesRhs/>;
+        } else if (isChannelIssues) {
+            currentChannelNeeded = true;
+            content = <ChannelIssuesRhs/>;
+        } else if (isChannelRecurringTasks) {
+            currentChannelNeeded = true;
+            content = <ChannelRecurringTasksRhs/>;
+        } else if (isChannelPlans) {
+            currentChannelNeeded = true;
+            content = <ChannelPlansRhs/>;
+        } else if (isChannelDoneTasks) {
+            currentChannelNeeded = true;
+            content = <ChannelDoneTasksRhs/>;
         } else if (isPostEditHistory) {
             content = <PostEditHistory/>;
         }
