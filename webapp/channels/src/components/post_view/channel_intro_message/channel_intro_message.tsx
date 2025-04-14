@@ -700,7 +700,7 @@ function createStandardIntroMessage(
 
 function createSetHeaderButton(channel: Channel) {
     const channelIsArchived = channel.delete_at !== 0;
-    if (channelIsArchived) {
+    if (channel.type || channelIsArchived) {
         return null;
     }
 
