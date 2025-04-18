@@ -3,6 +3,7 @@
 
 import type {GlobalState as BaseGlobalState} from '@mattermost/types/store';
 
+import type {ChannelsState} from './channels';
 import type {PluginsState} from './plugins';
 import type {ViewsState} from './views';
 
@@ -13,6 +14,7 @@ export type DraggingState = {
 }
 
 export type GlobalState = BaseGlobalState & {
+    channels: ChannelsState;
     plugins: PluginsState;
     storage: {
         storage: Record<string, any>;

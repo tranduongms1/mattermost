@@ -59,6 +59,19 @@ type Routes struct {
 	PostsForUser    *mux.Router // 'api/v4/users/{user_id:[A-Za-z0-9]+}/posts'
 	PostForUser     *mux.Router // 'api/v4/users/{user_id:[A-Za-z0-9]+}/posts/{post_id:[A-Za-z0-9]+}'
 
+	Troubles           *mux.Router // 'api/v4/troubles'
+	TroublesForChannel *mux.Router // 'api/v4/channels/{channel_id:[A-Za-z0-9]+}/troubles'
+
+	Issues           *mux.Router // 'api/v4/issues'
+	IssuesForChannel *mux.Router // 'api/v4/channels/{channel_id:[A-Za-z0-9]+}/issues'
+
+	Plans           *mux.Router // 'api/v4/plans'
+	PlansForChannel *mux.Router // 'api/v4/channels/{channel_id:[A-Za-z0-9]+}/plans'
+
+	Tasks           *mux.Router // 'api/v4/tasks'
+	Task            *mux.Router // 'api/v4/tasks/{post_id:[A-Za-z0-9]+}'
+	TasksForChannel *mux.Router // 'api/v4/channels/{channel_id:[A-Za-z0-9]+}/tasks'
+
 	Files *mux.Router // 'api/v4/files'
 	File  *mux.Router // 'api/v4/files/{file_id:[A-Za-z0-9]+}'
 
@@ -207,6 +220,19 @@ func Init(srv *app.Server) (*API, error) {
 	api.BaseRoutes.PostsForUser = api.BaseRoutes.User.PathPrefix("/posts").Subrouter()
 	api.BaseRoutes.PostForUser = api.BaseRoutes.PostsForUser.PathPrefix("/{post_id:[A-Za-z0-9]+}").Subrouter()
 
+	api.BaseRoutes.Troubles = api.BaseRoutes.APIRoot.PathPrefix("/troubles").Subrouter()
+	api.BaseRoutes.TroublesForChannel = api.BaseRoutes.Channel.PathPrefix("/troubles").Subrouter()
+
+	api.BaseRoutes.Issues = api.BaseRoutes.APIRoot.PathPrefix("/issues").Subrouter()
+	api.BaseRoutes.IssuesForChannel = api.BaseRoutes.Channel.PathPrefix("/issues").Subrouter()
+
+	api.BaseRoutes.Plans = api.BaseRoutes.APIRoot.PathPrefix("/plans").Subrouter()
+	api.BaseRoutes.PlansForChannel = api.BaseRoutes.Channel.PathPrefix("/plans").Subrouter()
+
+	api.BaseRoutes.Tasks = api.BaseRoutes.APIRoot.PathPrefix("/tasks").Subrouter()
+	api.BaseRoutes.Task = api.BaseRoutes.Tasks.PathPrefix("/{post_id:[A-Za-z0-9]+}").Subrouter()
+	api.BaseRoutes.TasksForChannel = api.BaseRoutes.Channel.PathPrefix("/tasks").Subrouter()
+
 	api.BaseRoutes.Files = api.BaseRoutes.APIRoot.PathPrefix("/files").Subrouter()
 	api.BaseRoutes.File = api.BaseRoutes.Files.PathPrefix("/{file_id:[A-Za-z0-9]+}").Subrouter()
 	api.BaseRoutes.PublicFile = api.BaseRoutes.Root.PathPrefix("/files/{file_id:[A-Za-z0-9]+}/public").Subrouter()
@@ -293,6 +319,10 @@ func Init(srv *app.Server) (*API, error) {
 	api.InitTeam()
 	api.InitChannel()
 	api.InitPost()
+	api.InitTrouble()
+	api.InitIssue()
+	api.InitPlan()
+	api.InitTask()
 	api.InitFile()
 	api.InitUpload()
 	api.InitSystem()

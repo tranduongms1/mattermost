@@ -17,6 +17,7 @@ type Props = {
     intl: IntlShape;
     previousRhsState?: RhsState;
     isExpanded: boolean;
+    postType: string;
     actions: {
         showMentions: () => void;
         showSearchResults: () => void;
@@ -132,14 +133,34 @@ class RhsCardHeader extends React.PureComponent<Props> {
             );
         }
 
-        return (
-            <div className='sidebar--right__header'>
-                <span className='sidebar--right__title'>
-                    {back}
+        let header;
+        switch (this.props.postType) {
+            case 'custom_issue':
+                header = 'Chi tiết sự cố';
+                break;
+            case 'custom_trouble':
+                header = 'Chi tiết trouble';
+                break;
+            case 'custom_plan':
+                header = 'Chi tiết kế hoạch';
+                break;
+            case 'custom_task':
+                header = 'Chi tiết công việc';
+                break;
+            default:
+                header = (
                     <FormattedMessage
                         id='search_header.title5'
                         defaultMessage='Extra information'
                     />
+                );
+        }
+
+        return (
+            <div className='sidebar--right__header'>
+                <span className='sidebar--right__title'>
+                    {back}
+                    {header}
                 </span>
                 <div className='pull-right'>
                     <WithTooltip

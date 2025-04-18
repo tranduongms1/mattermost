@@ -7,6 +7,7 @@ import {getMyActiveChannelIds} from 'mattermost-redux/selectors/entities/channel
 import {get, onboardingTourTipsEnabled} from 'mattermost-redux/selectors/entities/preferences';
 
 import {getIsMobileView} from 'selectors/views/browser';
+import {getGlobalItem} from 'selectors/storage';
 
 import {StoragePrefixes} from 'utils/constants';
 import {getDraftInfoFromKey} from 'utils/storage_utils';
@@ -101,4 +102,36 @@ export function makeGetDraftsCount(): DraftCountSelector {
         (channelDrafts, rhsDrafts, myChannels) => [...channelDrafts, ...rhsDrafts].
             filter((draft) => myChannels.indexOf(draft.value.channelId) !== -1).length,
     );
+}
+
+export function makeGetPostDraft(type: string, multiple = false) {
+    let defaultDraft = {message: '', fileInfos: [], uploadsInProgress: [], props: {}, createAt: 0, updateAt: 0, channelId: '', rootId: type};
+    return (state: GlobalState, channelId: string): PostDraft => {
+        if (defaultDraft.channelId !== channelId) {
+            defaultDraft = {message: '', fileInfos: [], uploadsInProgress: [], props: {}, createAt: 0, updateAt: 0, channelId, rootId: type};
+        }
+        let key = `${type}_draft`;
+        if (multiple) {
+            key = `${type}_draft_${channelId}`;
+        }
+        const draft = getGlobalItem(state, key, defaultDraft);
+
+        let toReturn = defaultDraft;
+        if (
+            typeof draft.message !== 'undefined' &&
+            typeof draft.uploadsInProgress !== 'undefined' &&
+            typeof draft.fileInfos !== 'undefined'
+        ) {
+            toReturn = draft;
+        }
+
+        if (draft.channelId !== channelId || draft.rootId !== type) {
+            toReturn = {
+                ...draft,
+                channelId,
+            };
+        }
+
+        return toReturn;
+    };
 }
