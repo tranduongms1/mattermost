@@ -71,7 +71,7 @@ export function emitChannelClickEvent(channel: Channel) {
 
         const penultimate = LocalStorageStore.getPreviousChannelName(userId, teamId);
         const penultimateType = LocalStorageStore.getPreviousViewedType(userId, teamId);
-        if (penultimate !== chan.name) {
+        if (penultimate !== chan.name && chan.name !== 'town-square') {
             LocalStorageStore.setPenultimateChannelName(userId, teamId, penultimate);
             LocalStorageStore.setPreviousChannelName(userId, teamId, chan.name);
         }

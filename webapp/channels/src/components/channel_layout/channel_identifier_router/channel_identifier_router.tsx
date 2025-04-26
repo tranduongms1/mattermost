@@ -20,9 +20,11 @@ export interface Match {
 
 export type MatchAndHistory = Pick<Props, 'match' | 'history'>
 
-interface Props {
+export interface Props {
     match: Match;
+    staticPageId: string;
     actions: {
+        selectStaticPage: (id: string) => void;
         onChannelByIdentifierEnter: (props: MatchAndHistory) => any;
     };
     history: any;
@@ -42,6 +44,9 @@ export default class ChannelIdentifierRouter extends React.PureComponent<Props> 
     componentDidUpdate(prevProps: Props) {
         if (this.props.match.params.team !== prevProps.match.params.team ||
             this.props.match.params.identifier !== prevProps.match.params.identifier) {
+            if (this.props.match.params.identifier !== 'town-square' && this.props.staticPageId === 'news') {
+                this.props.actions.selectStaticPage('');
+            }
             clearTimeout(this.replaceUrlTimeout);
             this.props.actions.onChannelByIdentifierEnter(this.props);
             this.replaceUrlIfPermalink();
@@ -66,6 +71,9 @@ export default class ChannelIdentifierRouter extends React.PureComponent<Props> 
     };
 
     render() {
+        const {match: {params: {identifier}}, staticPageId} = this.props;
+        if (identifier === 'town-square' && staticPageId !== 'news') return null;
+
         return <ChannelView/>;
     }
 }
