@@ -383,6 +383,7 @@ export default class SidebarList extends React.PureComponent<Props, State> {
     };
 
     renderCategory = (category: ChannelCategory, index: number) => {
+        if (category.type === 'channels') return null;
         return (
             <SidebarCategory
                 key={category.id}

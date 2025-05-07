@@ -79,6 +79,11 @@ const (
 	PostPriorityUrgent               = "urgent"
 	PostPropsRequestedAck            = "requested_ack"
 	PostPropsPersistentNotifications = "persistent_notifications"
+
+	PostStatusNew       = "new"
+	PostStatusConfirmed = "confirmed"
+	PostStatusDone      = "done"
+	PostStatusCompleted = "completed"
 )
 
 type Post struct {
