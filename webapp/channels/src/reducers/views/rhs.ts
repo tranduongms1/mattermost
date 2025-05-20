@@ -115,6 +115,11 @@ function selectedChannelId(state = '', action: AnyAction) {
             RHSStates.CHANNEL_FILES,
             RHSStates.CHANNEL_INFO,
             RHSStates.CHANNEL_MEMBERS,
+            RHSStates.CHANNEL_TROUBLES,
+            RHSStates.CHANNEL_ISSUES,
+            RHSStates.CHANNEL_PLANS,
+            RHSStates.CHANNEL_RECURRING_TASKS,
+            RHSStates.CHANNEL_DONE_TASKS,
             RHSStates.EDIT_HISTORY,
         ].includes(action.state)) {
             return action.channelId;
@@ -395,6 +400,28 @@ function shouldFocusRHS(state = false, action: AnyAction) {
     }
 }
 
+function statuses(state = [], action: AnyAction) {
+    switch (action.type) {
+    case ActionTypes.UPDATE_RHS_STATE:
+        if ([
+            RHSStates.CHANNEL_TROUBLES,
+            RHSStates.CHANNEL_ISSUES,
+            RHSStates.CHANNEL_PLANS,
+            RHSStates.CHANNEL_RECURRING_TASKS,
+            RHSStates.MY_TROUBLES,
+            RHSStates.MY_ISSUES,
+            RHSStates.MY_PLANS,
+        ].includes(action.state)) {
+            return action.statuses;
+        }
+        return [];
+    case UserTypes.LOGOUT_SUCCESS:
+        return [];
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
     selectedPostId,
     selectedPostFocussedAt,
@@ -416,4 +443,5 @@ export default combineReducers({
     isMenuOpen,
     editChannelMembers,
     shouldFocusRHS,
+    statuses,
 });
