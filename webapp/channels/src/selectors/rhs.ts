@@ -225,3 +225,7 @@ export function getIsRhsExpanded(state: GlobalState): boolean {
 export function getIsEditingMembers(state: GlobalState): boolean {
     return state.views.rhs.editChannelMembers === true;
 }
+
+export function getStatuses(state: GlobalState): string[] {
+    return state.views.rhs.statuses;
+}
