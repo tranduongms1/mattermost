@@ -79,6 +79,11 @@ const (
 	PostPriorityUrgent               = "urgent"
 	PostPropsRequestedAck            = "requested_ack"
 	PostPropsPersistentNotifications = "persistent_notifications"
+
+	PostStatusNew       = "new"
+	PostStatusConfirmed = "confirmed"
+	PostStatusDone      = "done"
+	PostStatusCompleted = "completed"
 )
 
 type Post struct {
@@ -380,6 +385,11 @@ type GetPostsOptions struct {
 	Direction                string // Only accepts up|down. Indicates the order in which to send the items.
 	IncludeDeleted           bool
 	IncludePostPriority      bool
+	Type                     string
+	Statuses                 []string
+	FromMe                   bool
+	ToMe                     bool
+	IsManager                bool
 }
 
 type PostCountOptions struct {
