@@ -128,17 +128,8 @@ export default class Reaction extends React.PureComponent<Props, State> {
             return;
         }
 
-        const {currentUserReacted} = this.props;
-
         this.animating = true;
         this.setState((state) => {
-            if (currentUserReacted) {
-                return {
-                    displayNumber: state.displayNumber - 1,
-                    reactedClass: 'Reaction--unreacting',
-                };
-            }
-
             return {
                 displayNumber: state.displayNumber + 1,
                 reactedClass: 'Reaction--reacting',
@@ -147,7 +138,7 @@ export default class Reaction extends React.PureComponent<Props, State> {
     };
 
     handleAnimationEnded = (): void => {
-        const {actions, currentUserReacted, post, emojiName} = this.props;
+        const {actions, post, emojiName} = this.props;
 
         this.animating = false;
         this.setState<'reactedClass'>((state) => {
@@ -163,11 +154,7 @@ export default class Reaction extends React.PureComponent<Props, State> {
             return state;
         });
 
-        if (currentUserReacted) {
-            actions.removeReaction(post.id, emojiName);
-        } else {
-            actions.addReaction(post.id, emojiName);
-        }
+        actions.addReaction(post.id, emojiName);
     };
 
     loadMissingProfiles = async (): Promise<void> => {

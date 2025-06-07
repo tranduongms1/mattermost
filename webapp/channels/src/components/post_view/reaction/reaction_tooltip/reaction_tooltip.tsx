@@ -114,12 +114,7 @@ const ReactionTooltip: React.FC<Props> = (props: Props) => {
     );
 
     let clickTooltip;
-    if (currentUserReacted && canRemoveReactions) {
-        clickTooltip = intl.formatMessage({
-            id: 'reaction.clickToRemove',
-            defaultMessage: '(click to remove)',
-        });
-    } else if (!currentUserReacted && canAddReactions) {
+    if (!currentUserReacted && canAddReactions) {
         clickTooltip = intl.formatMessage({
             id: 'reaction.clickToAdd',
             defaultMessage: '(click to add)',

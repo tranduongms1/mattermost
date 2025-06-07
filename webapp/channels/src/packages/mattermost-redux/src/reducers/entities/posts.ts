@@ -1181,7 +1181,7 @@ export function reactions(state: RelationOneToOne<Post, Record<string, Reaction>
     case PostTypes.RECEIVED_REACTION: {
         const reaction = action.data as Reaction;
         const nextReactions = {...(state[reaction.post_id] || {})};
-        nextReactions[reaction.user_id + '-' + reaction.emoji_name] = reaction;
+        nextReactions[reaction.user_id + '-' + reaction.emoji_name + '-' + reaction.create_at] = reaction;
 
         return {
             ...state,
@@ -1316,7 +1316,7 @@ function storeReactionsForPost(state: RelationOneToOne<Post, Record<string, Reac
     const reactionsForPost: Record<string, Reaction> = {};
     if (post.metadata.reactions && post.metadata.reactions.length > 0) {
         for (const reaction of post.metadata.reactions) {
-            reactionsForPost[reaction.user_id + '-' + reaction.emoji_name] = reaction;
+            reactionsForPost[reaction.user_id + '-' + reaction.emoji_name + '-' + reaction.create_at] = reaction;
         }
     }
 

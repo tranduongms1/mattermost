@@ -170,7 +170,7 @@ export function toggleReaction(postId: string, emojiName: string): ActionFuncAsy
 
         const isReactionAlreadyAddedToPost = getIsReactionAlreadyAddedToPost(state, postId, emojiName);
 
-        if (isReactionAlreadyAddedToPost) {
+        if ((window as any).singleReaction && isReactionAlreadyAddedToPost) {
             return dispatch(PostActions.removeReaction(postId, emojiName));
         }
         return dispatch(addReaction(postId, emojiName));

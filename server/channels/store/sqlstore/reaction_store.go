@@ -385,9 +385,7 @@ func (s *SqlReactionStore) saveReactionAndUpdatePost(transaction *sqlxTxWrapper,
 				Reactions
 				(UserId, PostId, EmojiName, CreateAt, UpdateAt, DeleteAt, RemoteId, ChannelId)
 			VALUES
-				(:UserId, :PostId, :EmojiName, :CreateAt, :UpdateAt, :DeleteAt, :RemoteId, :ChannelId)
-			ON CONFLICT (UserId, PostId, EmojiName)
-				DO UPDATE SET UpdateAt = :UpdateAt, DeleteAt = :DeleteAt, RemoteId = :RemoteId, ChannelId = :ChannelId`, reaction); err != nil {
+				(:UserId, :PostId, :EmojiName, :CreateAt, :UpdateAt, :DeleteAt, :RemoteId, :ChannelId)`, reaction); err != nil {
 			return err
 		}
 	}
