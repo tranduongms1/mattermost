@@ -14,7 +14,7 @@ import {getCurrentTeam} from 'mattermost-redux/selectors/entities/teams';
 import {clearChannelSelection} from 'actions/views/channel_sidebar';
 import {closeModal, openModal} from 'actions/views/modals';
 import {closeRightHandSide} from 'actions/views/rhs';
-import {getIsLhsOpen} from 'selectors/lhs';
+import {getCurrentStaticPageId, getIsLhsOpen} from 'selectors/lhs';
 import {getIsRhsOpen, getRhsState} from 'selectors/rhs';
 import {getIsMobileView} from 'selectors/views/browser';
 import {isUnreadFilterEnabled} from 'selectors/views/channel_sidebar';
@@ -41,6 +41,7 @@ function mapStateToProps(state: GlobalState) {
         canJoinPublicChannel = haveICurrentChannelPermission(state, Permissions.JOIN_PUBLIC_CHANNELS);
     }
 
+    const isContacts = getCurrentStaticPageId(state) === 'contacts';
     const canCreateCustomGroups = haveISystemPermission(state, {permission: Permissions.CREATE_CUSTOM_GROUP}) && isCustomGroupsEnabled(state);
 
     return {
@@ -48,6 +49,7 @@ function mapStateToProps(state: GlobalState) {
         canCreatePrivateChannel,
         canCreatePublicChannel,
         canJoinPublicChannel,
+        isContacts,
         isOpen: getIsLhsOpen(state),
         unreadFilterEnabled,
         isMobileView: getIsMobileView(state),

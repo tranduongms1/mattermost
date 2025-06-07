@@ -22,6 +22,7 @@ import {trackEvent} from 'actions/telemetry_actions';
 
 import {makeAsyncComponent} from 'components/async_load';
 import SidebarCategory from 'components/sidebar/sidebar_category';
+import SidebarChannel from 'components/sidebar/sidebar_channel';
 
 import {findNextUnreadChannelId} from 'utils/channel_utils';
 import {Constants, DraggingStates, DraggingStateTypes} from 'utils/constants';
@@ -383,6 +384,7 @@ export default class SidebarList extends React.PureComponent<Props, State> {
     };
 
     renderCategory = (category: ChannelCategory, index: number) => {
+        if (category.type === 'channels') return null;
         return (
             <SidebarCategory
                 key={category.id}
@@ -548,6 +550,9 @@ export default class SidebarList extends React.PureComponent<Props, State> {
         );
 
         const ariaLabel = localizeMessage({id: 'accessibility.sections.lhsList', defaultMessage: 'channel sidebar region'});
+        const defaultChannelId = categories.find(c => c.type === 'channels')?.channel_ids.find(
+            (id) => this.props.displayedChannels.find(c => c.id === id && c.name === 'town-square')
+        );
 
         return (
 
@@ -555,6 +560,17 @@ export default class SidebarList extends React.PureComponent<Props, State> {
             <>
                 <GlobalThreadsLink/>
                 <DraftsLink/>
+                {defaultChannelId &&
+                <SidebarChannel
+                    setChannelRef={() => {}}
+                    channelId={defaultChannelId}
+                    channelIndex={0}
+                    isCategoryCollapsed={false}
+                    isCategoryDragged={false}
+                    isDraggable={false}
+                    isAutoSortedCategory={false}
+                />
+                }
                 <div
                     id='sidebar-left'
                     role='application'
