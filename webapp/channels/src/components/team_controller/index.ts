@@ -11,6 +11,7 @@ import {getLicense, getConfig} from 'mattermost-redux/selectors/entities/general
 import {getCurrentTeamId, getMyTeams} from 'mattermost-redux/selectors/entities/teams';
 import {getCurrentUser} from 'mattermost-redux/selectors/entities/users';
 
+import {loadTechnicalChannels} from 'actions/task_actions';
 import {markAsReadOnFocus} from 'actions/views/channel';
 import {getSelectedPostId} from 'selectors/rhs';
 import {getSelectedThreadIdInCurrentTeam} from 'selectors/views/threads';
@@ -55,6 +56,7 @@ const mapDispatchToProps = {
     fetchChannelsAndMembers,
     fetchAllMyTeamsChannels,
     fetchAllMyChannelMembers,
+    loadTechnicalChannels,
     markAsReadOnFocus,
     initializeTeam,
     joinTeam,

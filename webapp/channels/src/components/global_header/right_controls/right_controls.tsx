@@ -22,8 +22,10 @@ import {isChannels} from 'utils/products';
 import type {GlobalState} from 'types/store';
 
 import AtMentionsButton from './at_mentions_button/at_mentions_button';
+import MyTasksButton from './my_tasks_button';
 import SavedPostsButton from './saved_posts_button/saved_posts_button';
 import SettingsButton from './settings_button';
+import TechnicalTasksButton from './technical_tasks_button';
 
 const RightControlsContainer = styled.div`
     display: flex;
@@ -66,6 +68,8 @@ const RightControls = ({productId = null}: Props): JSX.Element => {
         >
             {isChannels(productId) ? (
                 <>
+                    <TechnicalTasksButton/>
+                    <MyTasksButton/>
                     <AtMentionsButton/>
                     <SavedPostsButton/>
                 </>
