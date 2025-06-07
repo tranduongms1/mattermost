@@ -20,8 +20,9 @@ import {
 } from 'mattermost-redux/selectors/entities/teams';
 
 import {switchTeam, updateTeamsOrderForUser} from 'actions/team_actions';
+import {selectStaticPage} from 'actions/views/lhs';
 import {getCurrentLocale} from 'selectors/i18n';
-import {getIsLhsOpen} from 'selectors/lhs';
+import {getCurrentStaticPageId, getIsLhsOpen} from 'selectors/lhs';
 
 import {Preferences} from 'utils/constants';
 
@@ -44,6 +45,7 @@ function mapStateToProps(state: GlobalState) {
         currentTeamId: getCurrentTeamId(state),
         myTeams: getMyTeams(state),
         isOpen: getIsLhsOpen(state),
+        staticPageId: getCurrentStaticPageId(state),
         experimentalPrimaryTeam,
         locale: getCurrentLocale(state),
         moreTeamsToJoin,
@@ -61,6 +63,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
         actions: bindActionCreators({
             getTeams,
             switchTeam,
+            selectStaticPage,
             updateTeamsOrderForUser,
         }, dispatch),
     };

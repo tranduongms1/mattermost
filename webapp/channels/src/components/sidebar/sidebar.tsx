@@ -20,6 +20,7 @@ import type {ModalData} from 'types/actions';
 import type {RhsState} from 'types/store/rhs';
 
 import ChannelNavigator from './channel_navigator';
+import Contacts from './contacts';
 import SidebarList from './sidebar_list';
 
 const MobileSidebarHeader = makeAsyncComponent('MobileSidebarHeader', lazy(() => import('./mobile_sidebar_header')));
@@ -37,6 +38,7 @@ type Props = {
     canCreatePublicChannel: boolean;
     canCreatePrivateChannel: boolean;
     canJoinPublicChannel: boolean;
+    isContacts: boolean;
     isOpen: boolean;
     actions: {
         fetchMyCategories: (teamId: string) => void;
@@ -223,6 +225,19 @@ export default class Sidebar extends React.PureComponent<Props, State> {
     };
 
     render() {
+        if (this.props.isContacts) {
+            return (
+                <ResizableLhs
+                    id='SidebarContainer'
+                    className={classNames({
+                        'move--right': this.props.isOpen && this.props.isMobileView,
+                        dragging: this.state.isDragging,
+                    })}
+                >
+                    <Contacts/>
+                </ResizableLhs>
+            );
+        }
         if (!this.props.teamId) {
             return (<div/>);
         }

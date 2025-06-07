@@ -203,7 +203,7 @@ export default class TeamSidebar extends React.PureComponent<Props, State> {
 
     render() {
         const root: Element | null = document.querySelector('#root');
-        if (this.props.myTeams.length <= 1) {
+        if (this.props.myTeams.length <= 0) {
             root!.classList.remove('multi-teams');
             return null;
         }
@@ -223,7 +223,7 @@ export default class TeamSidebar extends React.PureComponent<Props, State> {
                     key={'switch_team_' + team.name}
                     url={`/${team.name}`}
                     tip={team.display_name}
-                    active={team.id === this.props.currentTeamId}
+                    active={team.id === this.props.currentTeamId && this.props.staticPageId !== 'contacts'}
                     displayName={team.display_name}
                     order={index + 1}
                     showOrder={this.state.showOrder}
@@ -231,7 +231,10 @@ export default class TeamSidebar extends React.PureComponent<Props, State> {
                     mentions={this.props.mentionsInTeamMap.has(team.id) ? this.props.mentionsInTeamMap.get(team.id) : 0}
                     hasUrgent={this.props.teamHasUrgentMap.has(team.id) ? this.props.teamHasUrgentMap.get(team.id) : false}
                     teamIconUrl={Utils.imageURLForTeam(team)}
-                    switchTeam={(url: string) => this.props.actions.switchTeam(url, currentProduct ? team : undefined)}
+                    switchTeam={(url: string) => {
+                        this.props.actions.selectStaticPage('');
+                        this.props.actions.switchTeam(url, currentProduct ? team : undefined);
+                    }}
                     isDraggable={true}
                     teamId={team.id}
                     teamIndex={index}
@@ -339,6 +342,14 @@ export default class TeamSidebar extends React.PureComponent<Props, State> {
                                 }}
                             </Droppable>
                         </DragDropContext>
+                        <TeamButton
+                            btnClass='mb-3'
+                            url='contacts'
+                            tip='Danh bạ'
+                            active={this.props.staticPageId === 'contacts'}
+                            content={<i className='fa fa-address-book-o'/>}
+                            switchTeam={() => this.props.actions.selectStaticPage("contacts")}
+                        />
                         {joinableTeams}
                     </Scrollbars>
                 </div>
