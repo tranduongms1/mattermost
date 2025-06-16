@@ -104,6 +104,7 @@ import {sendDesktopNotification} from 'actions/notification_actions.jsx';
 import {handleNewPost} from 'actions/post_actions';
 import * as StatusActions from 'actions/status_actions';
 import {setGlobalItem} from 'actions/storage';
+import {loadTechnicalChannels} from './task_actions';
 import {loadProfilesForDM, loadProfilesForGM} from 'actions/user_actions';
 import {syncPostsInChannel} from 'actions/views/channel';
 import {setGlobalDraft, transformServerDraft} from 'actions/views/drafts';
@@ -237,6 +238,7 @@ export function reconnect() {
 
         dispatch(loadChannelsForCurrentUser());
         dispatch(fetchAllMyChannelMembers());
+        dispatch(loadTechnicalChannels());
 
         if (mostRecentPost) {
             dispatch(syncPostsInChannel(currentChannelId, mostRecentPost.create_at));

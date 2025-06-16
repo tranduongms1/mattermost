@@ -513,7 +513,7 @@ export class DotMenuClass extends React.PureComponent<Props, State> {
                     class: 'hidden-xs',
                 }}
             >
-                {!isSystemMessage && this.props.location === Locations.CENTER &&
+                {!isSystemMessage && this.props.location === Locations.CENTER && (this.props.post.type) &&
                     <Menu.Item
                         id={`reply_to_post_${this.props.post.id}`}
                         data-testid={`reply_to_post_${this.props.post.id}`}
@@ -680,7 +680,7 @@ export class DotMenuClass extends React.PureComponent<Props, State> {
                         onClick={this.copyText}
                     />
                 }
-                {this.state.canDelete &&
+                {this.state.canDelete && this.state.canEdit &&
                     <Menu.Item
                         id={`delete_post_${this.props.post.id}`}
                         data-testid={`delete_post_${this.props.post.id}`}
