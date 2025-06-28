@@ -3,9 +3,11 @@
 
 import plugins from './plugins';
 import storage from './storage';
+import tasks from './tasks';
 import views from './views';
 
 export default {
+    tasks,
     views,
     plugins,
     storage,

@@ -62,7 +62,7 @@ function makeMapStateToProps() {
     return function mapStateToProps(state: GlobalState, ownProps: Props) {
         const {post} = ownProps;
 
-        const license = getLicense(state);
+        const license = {...getLicense(state), IsLicensed: 'true'};
         const config = getConfig(state);
         const userId = getCurrentUserId(state);
         const channel = getChannel(state, post.channel_id);

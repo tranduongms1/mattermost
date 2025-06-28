@@ -87,6 +87,33 @@ export function updateRhsState(rhsState: string, channelId?: string, previousRhs
     };
 }
 
+export function updateRhsStateWithStatuses(rhsState: string, statuses: string[], previousRhsState?: RhsState): ActionFunc<boolean> {
+    return (dispatch, getState) => {
+        const action: AnyAction = {
+            type: ActionTypes.UPDATE_RHS_STATE,
+            state: rhsState,
+            statuses,
+        };
+
+        if ([
+            RHSStates.CHANNEL_TROUBLES,
+            RHSStates.CHANNEL_ISSUES,
+            RHSStates.CHANNEL_PLANS,
+            RHSStates.CHANNEL_RECURRING_TASKS,
+            RHSStates.CHANNEL_DONE_TASKS,
+        ].includes(rhsState)) {
+            action.channelId = getCurrentChannelId(getState());
+        }
+        if (previousRhsState) {
+            action.previousRhsState = previousRhsState;
+        }
+
+        dispatch(action);
+
+        return {data: true};
+    };
+}
+
 export function openShowEditHistory(post: Post) {
     return {
         type: ActionTypes.UPDATE_RHS_STATE,

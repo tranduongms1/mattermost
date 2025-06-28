@@ -63,6 +63,7 @@ function TeamController(props: Props) {
 
         props.fetchAllMyChannelMembers();
         fetchAllChannels();
+        props.loadTechnicalChannels();
     }, []);
 
     useEffect(() => {

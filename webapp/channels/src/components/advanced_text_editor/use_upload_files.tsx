@@ -19,6 +19,8 @@ import type TextboxClass from 'components/textbox/textbox';
 
 import type {PostDraft} from 'types/store/draft';
 
+export type UploadError = (ServerError & { submittedMessage?: string }) | null;
+
 const getFileCount = (draft: PostDraft) => {
     return draft.fileInfos.length + draft.uploadsInProgress.length;
 };

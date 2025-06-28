@@ -17,6 +17,7 @@ type Props = {
     intl: IntlShape;
     previousRhsState?: RhsState;
     isExpanded: boolean;
+    postType: string;
     actions: {
         showMentions: () => void;
         showSearchResults: () => void;
@@ -24,6 +25,7 @@ type Props = {
         showPinnedPosts: () => void;
         closeRightHandSide: () => void;
         toggleRhsExpanded: () => void;
+        updateRhsState: (rhsState: string, channelId?: string, previousRhsState?: RhsState) => void;
     };
 };
 
@@ -132,14 +134,54 @@ class RhsCardHeader extends React.PureComponent<Props> {
             );
         }
 
-        return (
-            <div className='sidebar--right__header'>
-                <span className='sidebar--right__title'>
-                    {back}
+        let header;
+        switch (this.props.postType) {
+            case 'custom_issue':
+                header = 'Chi tiết sự cố';
+                break;
+            case 'custom_trouble':
+                header = 'Chi tiết trouble';
+                break;
+            case 'custom_plan':
+                header = 'Chi tiết kế hoạch';
+                break;
+            case 'custom_task':
+                back = (
+                    <WithTooltip
+                        id='backToMyTasks'
+                        title='Quay lại công việc cá nhân'
+                        placement='top'
+                    >
+                        <button
+                            className='sidebar--right__back btn btn-icon btn-sm'
+                            onClick={(e) => {
+                                e.preventDefault();
+                                this.props.actions.updateRhsState(RHSStates.MY_TASKS);
+                            }}
+                            aria-label={this.props.intl.formatMessage({id: 'rhs_header.back.icon', defaultMessage: 'Back Icon'})}
+                        >
+                            <i
+                                className='icon icon-arrow-back-ios'
+                            />
+                        </button>
+                    </WithTooltip>
+                );
+                header = 'Chi tiết công việc';
+                break;
+            default:
+                header = (
                     <FormattedMessage
                         id='search_header.title5'
                         defaultMessage='Extra information'
                     />
+                );
+        }
+
+        return (
+            <div className='sidebar--right__header'>
+                <span className='sidebar--right__title'>
+                    {back}
+                    {header}
                 </span>
                 <div className='pull-right'>
                     <WithTooltip

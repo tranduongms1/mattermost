@@ -13,3 +13,169 @@
 @import 'responsive/module';
 @import 'widgets/module';
 @import 'admin_console_base/module';
+
+.channel-header__icon.outline {
+    padding: 4px 6px;
+    border: 1px solid;
+    border-radius: 8px;
+    margin-right: 8px;
+}
+
+.modal-footer #fileUploadButton {
+    width: 40px;
+    height: 40px;
+    margin-right: 8px;
+}
+
+#sidebar-right {
+    min-width: 416px !important;
+}
+
+.sidebar--right__title {
+    line-height: 2rem !important;
+}
+
+#sidebar-right .post__main:has(.attachment) {
+    width: 100%;
+}
+
+#sidebar-right .post--thread.post--bot {
+    padding: 0 24px;
+
+    .post__content {
+        padding-right: 0;
+    }
+    .post__img {
+        display: none;
+    }
+    .post__img + div {
+        max-width: initial;
+        flex: 1 1 auto;
+    }
+    .post__header .col__name,
+    .post__header .col.d-flex {
+        display: none !important;
+    }
+    .AutoHeight {
+        width: 100% !important;
+    }
+    .attachment-actions .btn {
+        padding: 0 6px 0 2px;
+        gap: 4px;
+    }
+    .file-view--single,
+    .post-image__columns {
+        display: none !important;
+    }
+}
+
+@media (min-width: 768px) {
+    #sidebar-right .search-item__jump {
+        display: none;
+    }
+
+    #sidebar-right .post:hover,
+    #sidebar-right .post.post--hovered {
+        .search-item__jump {
+            display: block;
+        }
+    }
+}
+
+.post-right__scroll {
+    padding-top: 16px !important;
+}
+
+.post-card--info:not(.d-flex) {
+    padding: 8px 15px;
+    background-color: var(--center-channel-bg);
+    z-index: 3;
+
+    .btn {
+        background-color: var(--center-channel-bg);
+        color: var(--center-channel-color);
+
+        &:hover {
+            background-color: rgba(var(--center-channel-color-rgb), 0.08);
+        }
+    }
+}
+
+.post-card--info:not(.d-flex) .btn + .btn {
+    margin-left: 0;
+}
+
+.create-plan-modal {
+    .modal-content {
+        min-width: 648px;
+    }
+    .modal-body {
+        min-height: 432px;
+    }
+    .select-suggestion-container {
+        margin-top: 4px;
+        margin-bottom: 4px;
+    }
+}
+
+.create-task-modal {
+    .modal-content {
+        min-width: 648px;
+    }
+    .modal-body {
+        min-height: 496px;
+    }
+}
+
+.create-task-modal,
+.sidebar--right {
+    .react-select__control {
+        height: fit-content;
+    }
+
+    .react-select__multi-value__label {
+        color: var(--center-channel-color);
+    }
+
+    .react-select__menu {
+        z-index: 3;
+    }
+}
+
+.date-input {
+    width: 100%;
+    font-size: 14px;
+
+    &:hover {
+        border: 1px solid var(--button-bg);
+        cursor: pointer;
+    }
+
+    &:focus-within {
+        box-shadow: 0;
+    }
+
+    .Input_wrapper {
+        padding: 0 10px;
+    }
+
+    .calendar-icon {
+        margin: 0 8px 0 0;
+        color: rgba(var(--center-channel-color-rgb), 0.64);
+    }
+
+    .form-control {
+        height: auto;
+        padding: 0;
+        border: 0;
+        font-weight: 400;
+
+        &[readonly] {
+            background: transparent !important;
+        }
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+}

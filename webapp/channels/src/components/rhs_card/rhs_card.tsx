@@ -176,6 +176,7 @@ export default class RhsCard extends React.Component<Props, State> {
                 >
                     <div className='post-right__scroll'>
                         {content}
+                        {pluginPostCardTypes?.hasOwnProperty(postType) ||
                         <div className='d-flex post-card--info'>
                             <div className='post-card--post-by overflow--ellipsis'>
                                 <FormattedMessage
@@ -197,6 +198,7 @@ export default class RhsCard extends React.Component<Props, State> {
                                 </Link>
                             </div>
                         </div>
+                        }
                     </div>
                 </Scrollbars>
             </div>

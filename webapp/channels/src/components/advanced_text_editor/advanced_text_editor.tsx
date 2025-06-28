@@ -55,6 +55,10 @@ import SendButton from './send_button';
 import ShowFormat from './show_formatting';
 import TexteditorActions from './texteditor_actions';
 import ToggleFormattingBar from './toggle_formatting_bar';
+import useCreateIssue from './use_create_issue';
+import useCreateTrouble from './use_create_trouble';
+import useCreatePersonalTask from './use_create_personal_task';
+import useCreatePlan from './use_create_plan';
 import useEmojiPicker from './use_emoji_picker';
 import useKeyHandler from './use_key_handler';
 import useOrientationHandler from './use_orientation_handler';
@@ -247,6 +251,10 @@ const AdvancedTextEditor = ({
     useOrientationHandler(textboxRef, postId);
     const pluginItems = usePluginItems(draft, textboxRef, handleDraftChange);
     const focusTextbox = useTextboxFocus(textboxRef, channelId, isRHS, canPost);
+    const createIssue = useCreateIssue(location);
+    const createTrouble = useCreateTrouble(location);
+    const createPersonalTask = useCreatePersonalTask(location);
+    const createPlan = useCreatePlan(channel, location);
     const [attachmentPreview, fileUploadJSX] = useUploadFiles(draft, postId, channelId, isThreadView, storedDrafts, isDisabled, textboxRef, handleDraftChange, focusTextbox, setServerError);
     const {
         emojiPicker,
@@ -658,6 +666,10 @@ const AdvancedTextEditor = ({
                                     disabled={showPreview}
                                 />
                                 <Separator/>
+                                {createIssue}
+                                {createTrouble}
+                                {createPlan}
+                                {createPersonalTask}
                                 {fileUploadJSX}
                                 {emojiPicker}
                                 {sendButton}

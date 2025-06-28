@@ -35,6 +35,7 @@ import type {RhsState} from 'types/store/rhs';
 import ChannelHeaderTitle from './channel_header_title';
 import ChannelInfoButton from './channel_info_button';
 import HeaderIconWrapper from './components/header_icon_wrapper';
+import TechnicalActions from './technical_actions';
 
 const headerMarkdownOptions = {singleline: true, mentionHighlight: false, atMentions: true};
 const popoverMarkdownOptions = {singleline: false, mentionHighlight: false, atMentions: true};
@@ -497,6 +498,7 @@ class ChannelHeader extends React.PureComponent<Props, State> {
                             </div>
                         </div>
                     </div>
+                    <TechnicalActions channel={channel}/>
                     <ChannelHeaderPlug
                         channel={channel}
                         channelMember={channelMember}

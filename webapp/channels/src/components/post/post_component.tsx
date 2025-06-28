@@ -342,6 +342,10 @@ const PostComponent = (props: Props): JSX.Element => {
             return;
         }
 
+        if (!post.type && props.channelType !== 'O') {
+            return;
+        }
+
         if (
             !e.altKey &&
             props.clickToReply &&
@@ -363,6 +367,7 @@ const PostComponent = (props: Props): JSX.Element => {
         isEligibleForClick,
         isSystemMessage,
         props.channelIsArchived,
+        props.channelType,
         props.clickToReply,
         props.actions,
         props.location,
@@ -385,8 +390,10 @@ const PostComponent = (props: Props): JSX.Element => {
         if (!post) {
             return;
         }
-        props.actions.selectPostFromRightHandSideSearch(post);
-    }, [post, props.actions, props.actions.selectPostFromRightHandSideSearch]);
+        if (post.type || props.channelType === 'O') {
+            props.actions.selectPostFromRightHandSideSearch(post);
+        }
+    }, [post, props.channelType, props.actions, props.actions.selectPostFromRightHandSideSearch]);
 
     const handleThreadClick = useCallback((e: React.MouseEvent) => {
         if (props.currentTeam?.id === teamId) {

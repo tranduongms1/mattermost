@@ -467,6 +467,10 @@ export const ModalIdentifiers = {
     SECURE_CONNECTION_ACCEPT_INVITE: 'secure_connection_accept_invite',
     SHARED_CHANNEL_REMOTE_INVITE: 'shared_channel_remote_invite',
     SHARED_CHANNEL_REMOTE_UNINVITE: 'shared_channel_remote_uninvite',
+    CREATE_TROUBLE: 'create_trouble',
+    CREATE_ISSUE: 'create_issue',
+    CREATE_PLAN: 'create_plan',
+    CREATE_TASK: 'create_task',
 };
 
 export const UserStatuses = {
@@ -1038,6 +1042,16 @@ export const RHSStates = {
     CHANNEL_FILES: 'channel-files',
     CHANNEL_INFO: 'channel-info',
     CHANNEL_MEMBERS: 'channel-members',
+    CHANNEL_TROUBLES: 'channel-troubles',
+    CHANNEL_ISSUES: 'channel-issues',
+    CHANNEL_PLANS: 'channel-plans',
+    CHANNEL_RECURRING_TASKS: 'channel-recurring-tasks',
+    CHANNEL_DONE_TASKS: 'channel-done-tasks',
+    MY_TROUBLES: 'my-troubles',
+    MY_ISSUES: 'my-issues',
+    MY_PLANS: 'my-plans',
+    MY_TASKS: 'my-tasks',
+    TECHNICAL_TASKS: 'technical-tasks',
     EDIT_HISTORY: 'edit-history',
 };
 
@@ -2214,5 +2228,49 @@ export const PageLoadContext = {
     PAGE_LOAD: 'page_load',
     RECONNECT: 'reconnect',
 } as const;
+
+export const CustomPostActions: Record<string, {iconName: string; text: string; newStatus?: string}[]> = {
+    new: [
+        {
+            iconName: 'check',
+            text: 'Xác nhận',
+            newStatus: 'confirmed',
+        },
+        {
+            iconName: 'arrow-right',
+            text: 'Báo xong',
+            newStatus: 'done',
+        },
+    ],
+    confirmed: [
+        {
+            iconName: 'check',
+            text: 'Xác nhận',
+        },
+        {
+            iconName: 'arrow-right',
+            text: 'Báo xong',
+            newStatus: 'done',
+        },
+    ],
+    done: [
+        {
+            iconName: 'restore',
+            text: 'Làm lại',
+            newStatus: 'confirmed',
+        },
+        {
+            iconName: 'check-all',
+            text: 'Nghiệm thu',
+            newStatus: 'completed',
+        },
+    ],
+    completed: [
+        {
+            iconName: 'check-all',
+            text: 'Đã nghiệm thu hoàn thành',
+        },
+    ],
+};
 
 export default Constants;

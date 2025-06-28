@@ -42,6 +42,7 @@ export type RhsViewState = {
     editChannelMembers: boolean;
     size: SidebarSize;
     shouldFocusRHS: boolean;
+    statuses: string[];
 };
 
 export type RhsState = typeof RHSStates[keyof typeof RHSStates] | null;

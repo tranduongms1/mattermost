@@ -117,7 +117,7 @@ const PostOptions = (props: Props): JSX.Element => {
     const commentIconExtraClass = isMobileView ? '' : 'pull-right';
 
     let commentIcon;
-    if (showCommentIcon) {
+    if (showCommentIcon && post.type) {
         commentIcon = (
             <CommentIcon
                 handleCommentClick={props.handleCommentClick}
@@ -237,7 +237,7 @@ const PostOptions = (props: Props): JSX.Element => {
             <div className='col__controls post-menu'>
                 {dotMenu}
                 {flagIcon}
-                {props.canReply && !hasCRTFooter &&
+                {props.canReply && !hasCRTFooter && (post.type) &&
                     <CommentIcon
                         location={props.location}
                         handleCommentClick={props.handleCommentClick}

@@ -1241,12 +1241,86 @@ func (s *SqlPostStore) getPostsCollapsedThreads(options model.GetPostsOptions, s
 	return s.prepareThreadedResponse(posts, options.CollapsedThreadsExtended, false, sanitizeOptions)
 }
 
+func (s *SqlPostStore) getTasks(options model.GetPostsOptions) (*model.PostList, error) {
+	posts := []*model.Post{}
+	query := s.getQueryBuilder().
+		Select("*").
+		From("Posts p").
+		Where("p.DeleteAt = 0").
+		Where(sq.Eq{"p.Type": options.Type}).
+		Where(sq.Eq{"p.Props->>'status'": options.Statuses}).
+		Limit(uint64(options.PerPage)).
+		Offset(uint64(options.PerPage * options.Page))
+
+	if options.ChannelId != "" {
+		query = query.Where(sq.Eq{"p.ChannelId": options.ChannelId})
+	} else if options.Type != "custom_task" {
+		channelMemberSubquery := fmt.Sprintf(`
+			EXISTS (
+				SELECT 1
+				FROM ChannelMembers cm
+				WHERE cm.ChannelId = p.ChannelId
+				AND cm.UserId = '%s'
+			)
+		`, options.UserId)
+		teamMemberSubquery := fmt.Sprintf(`
+			EXISTS (
+				SELECT 1
+				FROM Teams t
+				JOIN TeamMembers tm ON t.Id = tm.TeamId
+				JOIN Channels c ON c.Id = p.ChannelId
+				WHERE tm.UserId = '%s'
+				AND c.Name = t.Name || '-ky-thuat'
+			)
+		`, options.UserId)
+		query = query.Where(sq.Or{
+			sq.Expr(channelMemberSubquery),
+			sq.Expr(teamMemberSubquery),
+		})
+	}
+
+	if options.FromMe {
+		query = query.Where(sq.Eq{"p.Props->>'creator_id'": options.UserId})
+	} else if options.ToMe {
+		query = query.Where("props->'assignee_ids' @> '\"" + options.UserId + "\"'")
+	} else if options.IsManager {
+		query = query.Where("props->'manager_ids' @> '\"" + options.UserId + "\"'")
+	} else if options.Type == "custom_task" {
+		query = query.Where(sq.Or{
+			sq.Eq{"p.Props->>'creator_id'": options.UserId},
+			sq.Expr("props->'assignee_ids' @> '\"" + options.UserId + "\"'"),
+			sq.Expr("props->'manager_ids' @> '\"" + options.UserId + "\"'"),
+		})
+	}
+
+	if len(options.Statuses) == 1 && options.Statuses[0] == "completed" {
+		query = query.OrderByClause("p.UpdateAt DESC")
+	} else {
+		query = query.OrderByClause("COALESCE(p.Props->>'priority', 'true') DESC, p.UpdateAt DESC")
+	}
+
+	queryString, args, _ := query.ToSql()
+	err := s.GetReplicaX().Select(&posts, queryString, args...)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to find Tasks")
+	}
+	list := model.NewPostList()
+	for _, p := range posts {
+		list.AddPost(p)
+		list.AddOrder(p.Id)
+	}
+	return list, nil
+}
+
 func (s *SqlPostStore) GetPosts(options model.GetPostsOptions, _ bool, sanitizeOptions map[string]bool) (*model.PostList, error) {
 	if options.PerPage > 1000 {
 		return nil, store.NewErrInvalidInput("Post", "<options.PerPage>", options.PerPage)
 	}
 	if options.CollapsedThreads {
 		return s.getPostsCollapsedThreads(options, sanitizeOptions)
+	}
+	if options.Type != "" {
+		return s.getTasks(options)
 	}
 	offset := options.PerPage * options.Page
 

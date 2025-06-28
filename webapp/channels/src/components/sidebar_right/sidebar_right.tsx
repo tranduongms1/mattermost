@@ -10,18 +10,28 @@ import type {Team} from '@mattermost/types/teams';
 
 import {trackEvent} from 'actions/telemetry_actions.jsx';
 
+import ChannelDoneTasksRhs from 'components/channel_done_tasks_rhs';
 import ChannelInfoRhs from 'components/channel_info_rhs';
+import ChannelIssuesRHS from 'components/channel_issues_rhs';
 import ChannelMembersRhs from 'components/channel_members_rhs';
+import ChannelPlansRHS from 'components/channel_plans_rhs';
+import ChannelRecurringTasksRHS from 'components/channel_recurring_tasks_rhs';
+import ChannelTroublesRHS from 'components/channel_troubles_rhs';
 import FileUploadOverlay from 'components/file_upload_overlay';
 import LoadingScreen from 'components/loading_screen';
+import MyTroublesRHS from 'components/my_troubles_rhs';
+import MyIssuesRHS from 'components/my_issues_rhs';
+import MyPlansRHS from 'components/my_plans_rhs';
+import MyTasksRHS from 'components/my_tasks_rhs';
 import PostEditHistory from 'components/post_edit_history';
 import ResizableRhs from 'components/resizable_sidebar/resizable_rhs';
 import RhsCard from 'components/rhs_card';
 import RhsThread from 'components/rhs_thread';
 import Search from 'components/search/index';
+import TechnicalTasksRHS from 'components/technical_tasks_rhs';
 
 import RhsPlugin from 'plugins/rhs_plugin';
-import Constants from 'utils/constants';
+import Constants, {RHSStates} from 'utils/constants';
 import {cmdOrCtrlPressed, isKeyPressed} from 'utils/keyboard';
 import {isMac} from 'utils/user_agent';
 
@@ -34,6 +44,7 @@ export type Props = {
     team?: Team;
     teamId: Team['id'];
     productId: ProductIdentifier;
+    rhsState: RhsState;
     postRightVisible: boolean;
     postCardVisible: boolean;
     searchVisible: boolean;
@@ -206,6 +217,7 @@ export default class SidebarRight extends React.PureComponent<Props, State> {
             team,
             channel,
             rhsChannel,
+            rhsState,
             postRightVisible,
             postCardVisible,
             previousRhsState,
@@ -225,6 +237,7 @@ export default class SidebarRight extends React.PureComponent<Props, State> {
         const teamNeeded = true;
         let selectedChannelNeeded;
         let currentChannelNeeded;
+        let body = null;
         let content = null;
 
         if (postRightVisible) {
@@ -245,6 +258,31 @@ export default class SidebarRight extends React.PureComponent<Props, State> {
         } else if (isChannelMembers) {
             currentChannelNeeded = true;
             content = <ChannelMembersRhs/>;
+        } else if (rhsState === RHSStates.CHANNEL_TROUBLES) {
+            currentChannelNeeded = true;
+            body = <ChannelTroublesRHS/>;
+        } else if (rhsState === RHSStates.CHANNEL_ISSUES) {
+            currentChannelNeeded = true;
+            body = <ChannelIssuesRHS/>;
+        } else if (rhsState === RHSStates.CHANNEL_PLANS) {
+            currentChannelNeeded = true;
+            body = <ChannelPlansRHS/>;
+        } else if (rhsState === RHSStates.CHANNEL_RECURRING_TASKS) {
+            currentChannelNeeded = true;
+            body = <ChannelRecurringTasksRHS/>;
+        } else if (rhsState === RHSStates.CHANNEL_DONE_TASKS) {
+            currentChannelNeeded = true;
+            body = <ChannelDoneTasksRhs/>;
+        } else if (rhsState === RHSStates.MY_TROUBLES) {
+            body = <MyTroublesRHS/>;
+        } else if (rhsState === RHSStates.MY_ISSUES) {
+            body = <MyIssuesRHS/>;
+        } else if (rhsState === RHSStates.MY_PLANS) {
+            body = <MyPlansRHS/>;
+        } else if (rhsState === RHSStates.MY_TASKS) {
+            body = <MyTasksRHS/>;
+        } else if (rhsState === RHSStates.TECHNICAL_TASKS) {
+            body = <TechnicalTasksRHS/>;
         } else if (isPostEditHistory) {
             content = <PostEditHistory/>;
         }
@@ -283,7 +321,7 @@ export default class SidebarRight extends React.PureComponent<Props, State> {
                                 {/* Sometimes the channel/team is not loaded yet, so we need to wait for it */}
                                 <LoadingScreen centered={true}/>
                             </div>
-                        ) : (
+                        ) : body || (
                             <Search
                                 isSideBarRight={true}
                                 isSideBarRightOpen={true}
