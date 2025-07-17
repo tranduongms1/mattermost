@@ -878,10 +878,22 @@ func (a *App) SetProfileImageFromMultiPartFile(c request.CTX, userID string, fil
 
 func (a *App) AdjustImage(file io.Reader) (*bytes.Buffer, *model.AppError) {
 	// Decode image into Image object
-	img, _, err := a.ch.imgDecoder.Decode(file)
+	var imgData io.ReadSeeker
+	if seeker, ok := file.(io.ReadSeeker); ok {
+		imgData = seeker
+	} else {
+		var buf bytes.Buffer
+		if _, err := io.Copy(&buf, file); err != nil {
+			return nil, model.NewAppError("SetProfileImage", "api.user.upload_profile_user.read_input_error", nil, "", http.StatusBadRequest).Wrap(err)
+		}
+		imgData = bytes.NewReader(buf.Bytes())
+	}
+
+	img, _, err := a.ch.imgDecoder.Decode(imgData)
 	if err != nil {
 		return nil, model.NewAppError("SetProfileImage", "api.user.upload_profile_user.decode.app_error", nil, "", http.StatusBadRequest).Wrap(err)
 	}
+	imgData.Seek(0, io.SeekStart)
 
 	orientation, _ := imaging.GetImageOrientation(file)
 	img = imaging.MakeImageUpright(img, orientation)
